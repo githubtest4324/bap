@@ -26,7 +26,7 @@ module.exports = function Compiler (sourceParam, resultParam, loggerParam) {
 	this.compile = function () {
 		var defaultNamespace;
 		if(this.result.compiled.defaultNamespace){
-			defaultNamespace = this.result.compiled.defaultNamespace
+			defaultNamespace = this.result.compiled.defaultNamespace;
 		} else{
 			defaultNamespace = new Namespace();
 			defaultNamespace.$isDefault = true;
