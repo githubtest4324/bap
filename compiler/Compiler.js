@@ -1,17 +1,19 @@
 var BapError = require('../BapError');
+var BapWarning = require('../BapWarning');
 var Namespace = require('./types/Namespace');
 var NamespaceCompiler = require('./compilers/NamespaceCompiler');
 var EntityCompiler = require('./compilers/EntityCompiler');
 var JsType = require('../utils/JsType');
 var Jef = require('json-easy-filter');
 
-module.exports = function Compiler (sourceParam, resultParam, loggerParam) {
+module.exports = function Compiler (sourceFileNameParam, sourceParam, resultParam, loggerParam) {
 	'use strict';
 	this.compilers = {};
 	this.logger = loggerParam;
 	this.source = sourceParam;
 	this.result = resultParam;
 	this.jefSrc = new Jef(this.source);
+	this.sourceFileName = sourceFileNameParam;
 
 	/**
 	 * @param source
@@ -56,7 +58,7 @@ module.exports = function Compiler (sourceParam, resultParam, loggerParam) {
 					factory.compile(this.jefSrc.get(name), defaultNamespace);
 					usesDefaultNamespace = true;
 				} else {
-					this.result.output.push(new BapError('E8472',name, 'Unknown type "{0}"'.format(this.source[name].type)));
+					this.error('E8472',name, 'Unknown type "{0}"'.format(this.source[name].type));
 				}
 			}
 		}
@@ -66,27 +68,41 @@ module.exports = function Compiler (sourceParam, resultParam, loggerParam) {
 		}
 	};
 
+	/**
+	 * Used by compilers to emit warnings.
+	 */
+	this.warn = function(code, path, message){
+		this.result.output.push(new BapWarning(code, this.sourceFileName, path, message));
+	};
+	
+	/**
+	 * Used by compilers to emit errors.
+	 */
+	this.error = function(code, path, message){
+		this.result.output.push(new BapError(code, this.sourceFileName, path, message));
+	};
+	
 	this._validate = function () {
 		var res = true;
 		var root = this.source;
-		var output = this.result.output;
 
 		if (!root) {
-			output.push(new BapError('E4632', '', 'No content was received to be compiled'));
+			this.error('E4632', '', 'No content was received to be compiled');
 			res = false;
 		}
 
 		// Must be an object
 		if (root.typeOf() !== JsType.OBJECT) {
-			output.push(new BapError('E5398', '', 'Received source content must be a complex json object. The one received is of type "{0}"'.format(root.typeOf())));
+			this.error('E5398', '', 'Received source content must be a complex json object. The one received is of type "{0}"'.format(root.typeOf()));
 			res = false;
 		}
 
 		// 'type' not allowed as root element.
 		if (root.hasProp('type')) {
-			output.push(new BapError('E02943', '', '"type" is not allowed as top level element'));
+			this.error('E2943', '', '"type" is not allowed as top level element');
 			res = false;
 		}
+		var that = this;
 		// Root must contain only properties with 'entity', 'page', 'webService'
 		// or no types
 		var validTypes = this.jefSrc.validate(function (node) {
@@ -94,10 +110,10 @@ module.exports = function Compiler (sourceParam, resultParam, loggerParam) {
 			if (node.level === 1) {
 				if (node.getType() !== JsType.OBJECT) {
 					valid = false;
-					output.push(new BapError('E3285', node.path, "Only objects allowed as top level elements.".format(node.value.type)));
+					that.error('E3285', node.path, "Only objects allowed as top level elements.".format(node.value.type));
 				} else if (!(!node.value.type || node.value.type === EntityCompiler.type)) {
 					valid = false;
-					output.push(new BapError('E5295', node.path, "Type '{0}' not allowed for a top level element.".format(node.value.type)));
+					that.error('E5295', node.path, "Type '{0}' not allowed for a top level element.".format(node.value.type));
 				}
 			}
 			return valid;
