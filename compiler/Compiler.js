@@ -113,26 +113,6 @@ module.exports = function Compiler (sourceFileNameParam, sourceParam, resultPara
 			this.error('E2943', '', '"type" is not allowed as top level element');
 			res = false;
 		}
-//		var that = this;
-//		// Root must contain only properties with 'entity', 'page', 'webService'
-//		// or no types
-//		var validTypes = this._jefSrc.validate(function (node) {
-//			var valid = true;
-//			if (node.level === 1) {
-//				if (node.getType() !== JsType.OBJECT) {
-//					valid = false;
-//					that.error('E3285', node.path, "Only objects allowed as top level elements.".format(node.value.type));
-//				} else if (!(!node.value.type || node.value.type === EntityCompiler.type)) {
-//					valid = false;
-//					that.error('E5295', node.path, "Type '{0}' not allowed for a top level element.".format(node.value.type));
-//				}
-//			}
-//			return valid;
-//		});
-//		if (!validTypes) {
-//			res = false;
-//		}
-
 		return res;
 	};
 
