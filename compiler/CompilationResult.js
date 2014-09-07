@@ -13,7 +13,7 @@ module.exports = function CompilationResult () {
 	 * 
 	 * @type {Array}
 	 */
-	this.output = [];
+	this.errors = [];
 
 	this.toString = function () {
 		return JSON.stringify(this.compiled, function (key, value) {
@@ -32,19 +32,10 @@ module.exports = function CompilationResult () {
 			}
 		}, 4);
 	};
-	this.errorsToString = function(){
-		var res = '';
-		if (this.output.length > 0) {
-			this.output.forEach(function (val) {
-				res+=val.toString();
-			});
-		}
-		return res;
-	};
 	this.errorsToStringArray = function(){
 		var res = [];
-		if (this.output.length > 0) {
-			this.output.forEach(function (val) {
+		if (this.errors.length > 0) {
+			this.errors.forEach(function (val) {
 				res.push(val.toString());
 			});
 		}

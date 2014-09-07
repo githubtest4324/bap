@@ -72,14 +72,14 @@ module.exports = function Compiler (sourceFileNameParam, sourceParam, resultPara
 	 * Used by compilers to emit warnings.
 	 */
 	this.warn = function(code, path, message){
-		this.result.output.push(new BapWarning(code, this.sourceFileName, path, message));
+		this.result.errors.push(new BapWarning(code, this.sourceFileName, path, message));
 	};
 	
 	/**
 	 * Used by compilers to emit errors.
 	 */
 	this.error = function(code, path, message){
-		this.result.output.push(new BapError(code, this.sourceFileName, path, message));
+		this.result.errors.push(new BapError(code, this.sourceFileName, path, message));
 	};
 	
 	this._validate = function () {
