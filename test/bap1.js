@@ -1,4 +1,5 @@
 module.exports = {
+	"type": "dd",
 	"ecom" : {
 		"customers" : {
 			"Customer" : {
