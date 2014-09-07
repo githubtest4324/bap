@@ -32,4 +32,22 @@ module.exports = function CompilationResult () {
 			}
 		}, 4);
 	};
+	this.errorsToString = function(){
+		var res = '';
+		if (this.output.length > 0) {
+			this.output.forEach(function (val) {
+				res+=val.toString();
+			});
+		}
+		return res;
+	};
+	this.errorsToStringArray = function(){
+		var res = [];
+		if (this.output.length > 0) {
+			this.output.forEach(function (val) {
+				res.push(val.toString());
+			});
+		}
+		return res;
+	};
 };
