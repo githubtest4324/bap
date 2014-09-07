@@ -10,7 +10,9 @@ function runTests() {
 	var res = null;
 	console.log('Tests1 - filter');
 	res = tests1.test1();
-	console.log('tests1/test1_filter: ' + passed(res));
+	console.log('tests1/test1: ' + passed(res));
+	res = tests1.test2();
+	console.log('tests1/test2: ' + passed(res));
 }
 
 

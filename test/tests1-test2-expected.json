@@ -1,0 +1,16 @@
+{
+    "ns1": {
+        "$type": "namespace",
+        "$isDefault": false,
+        "$namespace": "ns1",
+        "$name": "ns1",
+        "$parent": "root",
+        "ns2": {
+            "$type": "namespace",
+            "$isDefault": false,
+            "$namespace": "ns1.ns2",
+            "$name": "ns2",
+            "$parent": "Namespace: ns1"
+        }
+    }
+}
