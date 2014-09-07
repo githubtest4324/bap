@@ -1,6 +1,5 @@
 var Namespace = require('../types/Namespace');
 var JsType = require('../../utils/JsType.js');
-var EntityCompiler = require('./EntityCompiler.js');
 
 module.exports = {
 	type : 'namespace',
@@ -43,8 +42,10 @@ module.exports = {
 					this.compile(srcNode.get(childName), res);
 				} else {
 					// Other element
-					var compiler = this.compiler.compilers[child.type];
-					compiler.compile(srcNode.get(childName), res);
+					var typeCompiler = this.compiler.compilers[child.type];
+					if(typeCompiler){
+						typeCompiler.compile(srcNode.get(childName), res);
+					}
 				}
 			}
 		};
@@ -64,15 +65,13 @@ module.exports = {
 		 * 'entity', 'page', 'webService' or no types (other namespaces).
 		 */
 		this._allowedTypes = function (srcNode) {
+			var that = this;
 			var res = srcNode.validate(function (node, local) {
 				var valid = true;
 				if (local.level === 1) {
 					if (node.getType() !== JsType.OBJECT) {
 						valid = false;
-						this.compiler.error('E8695', node.path, "Only complex objects allowed as namespace elements.");
-					} else if (!(!node.has('type') || node.value.type === EntityCompiler.type)) {
-						valid = false;
-						this.compiler.error('E3187', node.path, "Invalid type.");
+						that.compiler.error('E8695', node.path, "Only complex objects allowed as namespace elements.");
 					}
 				}
 				return valid;
