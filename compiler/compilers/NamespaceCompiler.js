@@ -10,6 +10,7 @@ module.exports = {
 		this.compiler = compilerParam;
 
 		this.compile = function (srcNode, parent) {
+			srcNode.meta.used = true;
 			var name = srcNode.key;
 			var value = srcNode.value;
 			if (!this._validate(srcNode, parent)) {

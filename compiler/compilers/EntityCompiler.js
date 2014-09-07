@@ -9,8 +9,9 @@ module.exports = {
 		this.type = 'entity';
 		this.compiler = compilerParam;
 		this.compile = function (srcNode, parent) {
+			srcNode.meta.used = true;
+			srcNode.get('type').meta.used = true;
 			var name = srcNode.key;
-			var value = srcNode.value;
 			this._validate(srcNode, parent);
 
 			var res = new Entity();
@@ -19,33 +20,35 @@ module.exports = {
 			res.$parent = parent;
 
 			// Add properties
-			for ( var propSrcName in value.properties) {
-				var propSrc = value.properties[propSrcName];
-				var property = new EntityProperty();
-				res[propSrcName] = property;
-				property.$name = propSrcName;
+			srcNode.get('properties').meta.used = true;
+			srcNode.get('properties').filter(function(prop, local){
+				if(local.level===1){
+					prop.meta.used = true;
+					var property = new EntityProperty();
+					res[prop.key] = property;
+					property.$name = prop.key;
 
-				if (propSrc.typeOf() === JsType.STRING) {
-					// Inline property
-					property.$type = propSrc;
-					property.$translate = propSrcName;
-				} else {
-					// Expanded property
-					property.$type = propSrc.type;
-					if (propSrc.hasProp('translate')) {
-						property.$translate = propSrc.translate;
-					}
-					if (propSrc.hasProp('itemType')) {
-						property.$itemType = propSrc.itemType;
-					}
-					if (propSrc.hasProp('translate')) {
-						property.$translate = propSrc.translate;
+					if (prop.getType() === JsType.STRING) {
+						// Inline property
+						property.$type = prop.value;
+						property.$translate = prop.key;
 					} else {
-						property.$translate = propSrcName;
+						// Expanded property
+						property.$type = prop.value.type;
+						prop.get('type').meta.used = true;
+						if (prop.has('itemType')) {
+							prop.get('itemType').meta.used = true;
+							property.$itemType = prop.value.itemType;
+						}
+						if (prop.has('translate')) {
+							prop.get('translate').meta.used = true;
+							property.$translate = prop.value.translate;
+						} else {
+							property.$translate = prop.key;
+						}
 					}
 				}
-			}
-
+			});
 		};
 
 		this._validate = function (srcNode, parent) {

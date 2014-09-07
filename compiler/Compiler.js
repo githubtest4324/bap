@@ -5,6 +5,7 @@ var NamespaceCompiler = require('./compilers/NamespaceCompiler');
 var EntityCompiler = require('./compilers/EntityCompiler');
 var JsType = require('../utils/JsType');
 var Jef = require('json-easy-filter');
+var SrcMetadata = require('../src-metadata');
 
 module.exports = function Compiler (sourceFileNameParam, sourceParam, resultParam, loggerParam) {
 	'use strict';
@@ -12,7 +13,7 @@ module.exports = function Compiler (sourceFileNameParam, sourceParam, resultPara
 	this.logger = loggerParam;
 	this.source = sourceParam;
 	this.result = resultParam;
-	this.jefSrc = new Jef(this.source);
+	this._jefSrc = undefined;
 	this.sourceFileName = sourceFileNameParam;
 
 	/**
@@ -26,10 +27,12 @@ module.exports = function Compiler (sourceFileNameParam, sourceParam, resultPara
 	 *            List of type compilers
 	 */
 	this.compile = function () {
+
+		// default namespace
 		var defaultNamespace;
-		if(this.result.compiled.defaultNamespace){
+		if (this.result.compiled.defaultNamespace) {
 			defaultNamespace = this.result.compiled.defaultNamespace;
-		} else{
+		} else {
 			defaultNamespace = new Namespace();
 			defaultNamespace.$isDefault = true;
 			defaultNamespace.$namespace = '';
@@ -37,7 +40,14 @@ module.exports = function Compiler (sourceFileNameParam, sourceParam, resultPara
 			defaultNamespace.$parent = this.result.compiled;
 		}
 
-		// Build default list of compilers
+		// adnotate jef object
+		this._jefSrc = new Jef(this.source);
+		this._jefSrc.filter(function (node) {
+			node.meta = new SrcMetadata();
+		});
+		this._jefSrc.meta.used = true;
+
+		// build default list of compilers
 		this.compilers[NamespaceCompiler.type] = new NamespaceCompiler.compiler(this);
 		this.compilers[EntityCompiler.type] = new EntityCompiler.compiler(this);
 
@@ -45,20 +55,21 @@ module.exports = function Compiler (sourceFileNameParam, sourceParam, resultPara
 			return;
 		}
 
+		// compile
 		var usesDefaultNamespace = false;
 		for ( var name in this.source) {
 			if (!this.source[name].hasProp('type')) {
-				// Namespace
+				// namespace
 				var namespaceCompiler = this.compilers[NamespaceCompiler.type];
-				namespaceCompiler.compile(this.jefSrc.get(name), this.result.compiled);
+				namespaceCompiler.compile(this._jefSrc.get(name), this.result.compiled);
 			} else {
-				// Other element
+				// any other element
 				var factory = this.compilers[this.source[name].type];
 				if (factory) {
-					factory.compile(this.jefSrc.get(name), defaultNamespace);
+					factory.compile(this._jefSrc.get(name), defaultNamespace);
 					usesDefaultNamespace = true;
 				} else {
-					this.error('E8472',name, 'Unknown type "{0}"'.format(this.source[name].type));
+					this.error('E8472', name, 'Unknown type "{0}"'.format(this.source[name].type));
 				}
 			}
 		}
@@ -66,22 +77,24 @@ module.exports = function Compiler (sourceFileNameParam, sourceParam, resultPara
 		if (usesDefaultNamespace) {
 			this.result.compiled.defaultNamespace = defaultNamespace;
 		}
+
+		this._reportUnused();
 	};
 
 	/**
 	 * Used by compilers to emit warnings.
 	 */
-	this.warn = function(code, path, message){
+	this.warn = function (code, path, message) {
 		this.result.errors.push(new BapWarning(code, this.sourceFileName, path, message));
 	};
-	
+
 	/**
 	 * Used by compilers to emit errors.
 	 */
-	this.error = function(code, path, message){
+	this.error = function (code, path, message) {
 		this.result.errors.push(new BapError(code, this.sourceFileName, path, message));
 	};
-	
+
 	this._validate = function () {
 		var res = true;
 		var root = this.source;
@@ -105,7 +118,7 @@ module.exports = function Compiler (sourceFileNameParam, sourceParam, resultPara
 		var that = this;
 		// Root must contain only properties with 'entity', 'page', 'webService'
 		// or no types
-		var validTypes = this.jefSrc.validate(function (node) {
+		var validTypes = this._jefSrc.validate(function (node) {
 			var valid = true;
 			if (node.level === 1) {
 				if (node.getType() !== JsType.OBJECT) {
@@ -149,4 +162,12 @@ module.exports = function Compiler (sourceFileNameParam, sourceParam, resultPara
 		return currentObj;
 	};
 
+	this._reportUnused = function () {
+		var that = this;
+		this._jefSrc.filter(function (node) {
+			if (!node.meta.used) {
+				that.warn('W2430', node.path, 'Unused node');
+			}
+		});
+	};
 };

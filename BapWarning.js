@@ -1,6 +1,6 @@
 var utils = require('./utils/utils');
 
-module.exports = function BapWarning (code, srcFileNameParam, messageParam, pathParam) {
+module.exports = function BapWarning (code, srcFileNameParam, pathParam, messageParam) {
 	'use strict';
 	this.type = 'warning';
 	this.message = messageParam || '';
