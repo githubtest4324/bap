@@ -1,0 +1,102 @@
+{
+    "ns1": {
+        "$type": "namespace",
+        "$isDefault": false,
+        "$namespace": "ns1",
+        "$name": "ns1",
+        "$parent": "root",
+        "ns2": {
+            "$type": "namespace",
+            "$isDefault": false,
+            "$namespace": "ns1.ns2",
+            "$name": "ns2",
+            "$parent": "Namespace: ns1",
+            "e1": {
+                "$type": "entity",
+                "$name": "e1",
+                "$parent": "Namespace: ns1.ns2",
+                "f12": {
+                    "$type": "str",
+                    "$itemType": null,
+                    "$name": "f12",
+                    "$translate": "f12",
+                    "$computed": false
+                }
+            },
+            "e4": {
+                "$type": "entity",
+                "$name": "e4",
+                "$parent": "Namespace: ns1.ns2",
+                "f4": {
+                    "$type": "str",
+                    "$itemType": null,
+                    "$name": "f4",
+                    "$translate": "f4",
+                    "$computed": false
+                }
+            }
+        },
+        "e2": {
+            "$type": "entity",
+            "$name": "e2",
+            "$parent": "Namespace: ns1",
+            "f22": {
+                "$type": "str",
+                "$itemType": null,
+                "$name": "f22",
+                "$translate": "f22",
+                "$computed": false
+            }
+        },
+        "ns3": {
+            "$type": "namespace",
+            "$isDefault": false,
+            "$namespace": "ns1.ns3",
+            "$name": "ns3",
+            "$parent": "Namespace: ns1",
+            "e5": {
+                "$type": "entity",
+                "$name": "e5",
+                "$parent": "Namespace: ns1.ns3",
+                "f5": {
+                    "$type": "str",
+                    "$itemType": null,
+                    "$name": "f5",
+                    "$translate": "f5",
+                    "$computed": false
+                }
+            }
+        }
+    },
+    "defaultNamespace": {
+        "$type": "namespace",
+        "$isDefault": true,
+        "$namespace": "",
+        "$name": "",
+        "$parent": "root",
+        "e3": {
+            "$type": "entity",
+            "$name": "e3",
+            "$parent": "Namespace: ",
+            "f32": {
+                "$type": "str",
+                "$itemType": null,
+                "$name": "f32",
+                "$translate": "f32",
+                "$computed": false
+            }
+        },
+        "e6": {
+            "$type": "entity",
+            "$name": "e6",
+            "$parent": "Namespace: ",
+            "f6": {
+                "$type": "str",
+                "$itemType": null,
+                "$name": "f6",
+                "$translate": "f6",
+                "$computed": false
+            }
+        }
+    }
+}

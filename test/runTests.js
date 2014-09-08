@@ -13,6 +13,8 @@ function runTests() {
 	console.log('tests1/test1: ' + passed(res));
 	res = tests1.test2();
 	console.log('tests1/test2: ' + passed(res));
+	res = tests1.test3();
+	console.log('tests1/test3: ' + passed(res));
 }
 
 

@@ -39,9 +39,9 @@ module.exports = function Compiler (sourceFileNameParam, sourceParam, resultPara
 			defaultNamespace.$name = '';
 			defaultNamespace.$parent = this.result.compiled;
 		}
-		
+
 		this._removeComments();
-		
+
 		// adnotate jef object
 		this._jefSrc = new Jef(this.source);
 		this._jefSrc.filter(function (node) {
@@ -115,7 +115,7 @@ module.exports = function Compiler (sourceFileNameParam, sourceParam, resultPara
 			this.error('E2943', '', '"type" is not allowed as top level element');
 			res = false;
 		}
-		
+
 		// only objects allowed as direct children
 		var that = this;
 		var onlyChildObjects = this._jefSrc.validate(function (node) {
@@ -128,7 +128,7 @@ module.exports = function Compiler (sourceFileNameParam, sourceParam, resultPara
 			}
 			return valid;
 		});
-		if(!onlyChildObjects){
+		if (!onlyChildObjects) {
 			res = false;
 		}
 
@@ -163,22 +163,22 @@ module.exports = function Compiler (sourceFileNameParam, sourceParam, resultPara
 		var that = this;
 		this._jefSrc.filter(function (node) {
 			if (!node.meta.used) {
-				if(node.parent && node.parent.meta.used===true){
+				if (node.parent && node.parent.meta.used === true) {
 					that.warn('W2430', node.path, 'Unused node');
 				}
 			}
 		});
 	};
-	
-	this._removeComments = function(){
+
+	this._removeComments = function () {
 		var comments = [];
-		new Jef(this.source).filter(function(node){
-			if(node.key && node.key.indexOf('//')>=0){
+		new Jef(this.source).filter(function (node) {
+			if (node.key && node.key.indexOf('//') >= 0) {
 				comments.push(node);
 			}
 		});
-		comments.forEach(function(node){
-			if(node.parent){
+		comments.forEach(function (node) {
+			if (node.parent) {
 				delete node.parent.value[node.key];
 			}
 		});

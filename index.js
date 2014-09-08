@@ -1,5 +1,5 @@
 var BapCompilationResult = require('./compiler/CompilationResult');
-//var BapError = require('./BapError');
+// var BapError = require('./BapError');
 var Compiler = require('./compiler/Compiler');
 
 // Utils
@@ -10,7 +10,6 @@ var stringUtils = require('./utils/StringUtils');
 jsType.installPrototypeHas();
 jsType.installPrototypeTypeOf();
 stringUtils.installPrototypeFormat();
-
 
 module.exports = function (sources, logger) {
 	'use strict';
@@ -27,7 +26,7 @@ module.exports = function (sources, logger) {
 	this.compile = function () {
 		var result = new BapCompilationResult();
 		var that = this;
-		this._sources.forEach(function(source){
+		this._sources.forEach(function (source) {
 			var compiler = new Compiler(source.fileName, source.content, result, that._logger);
 			compiler.compile();
 		});
