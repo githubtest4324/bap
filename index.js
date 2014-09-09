@@ -2,6 +2,8 @@ var BapCompilationResult = require('./compiler/CompilationResult');
 // var BapError = require('./BapError');
 var Compiler = require('./compiler/Compiler');
 
+require('./compiler/compilers/EntityCompiler');
+
 // Utils
 var jsType = require('./utils/JsType');
 var stringUtils = require('./utils/StringUtils');

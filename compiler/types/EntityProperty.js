@@ -3,24 +3,24 @@ module.exports = function(){
 	/**
 	 * Any of obj, str, date, bool, num, list, entity
 	 */
-	this.$type = null;
+	this.$type = undefined;
 	/**
 	 * Used in case this.type is 'list'.
 	 * Any of obj, str, date, bool, num, list. May also be an entity.
 	 */
-	this.$itemType = null;
+	this.$itemType = undefined;
 
 	/**
 	 * Name of this property.
 	 * @type {string}
 	 */
-	this.$name = null;
+	this.$name = undefined;
 
 	/**
 	 * Translation string. If null it is considered to be name of the property.
 	 * @type {string}
 	 */
-	this.$translate = null;
+	this.$translate = undefined;
 
 	/**
 	 * Whether this property will be persisted in database or not.

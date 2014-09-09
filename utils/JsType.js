@@ -5,6 +5,7 @@ var internalJsType = {
 	FUNCTION : 'function',
 	UNDEFINED : 'undefined',
 	NUMBER : 'number',
+	BOOLEAN: 'boolean',
 	NULL : 'null',
 	/**
 	 * Returns the javascript type of an object.
