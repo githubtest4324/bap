@@ -3,6 +3,7 @@ var BapWarning = require('../BapWarning');
 var Namespace = require('./types/Namespace');
 var NamespaceCompiler = require('./compilers/NamespaceCompiler');
 var EntityCompiler = require('./compilers/EntityCompiler');
+var RestProcessor = require('../processors/rest-processor');
 var JsType = require('../utils/JsType');
 var Jef = require('json-easy-filter');
 var SrcMetadata = require('../src-metadata');
@@ -15,8 +16,12 @@ module.exports = function Compiler (sourceFileNameParam, sourceParam, resultPara
     this.result = resultParam;
     this._jefSrc = undefined;
     this.sourceFileName = sourceFileNameParam;
+    /**
+     * List of supported primitive types.
+     */
     this.primitives = {
-        src : 'src',
+        str : 'str',
+        list: 'list',
         entity : 'entity'
     };
 
@@ -56,6 +61,7 @@ module.exports = function Compiler (sourceFileNameParam, sourceParam, resultPara
         // build default list of compilers
         this.compilers[NamespaceCompiler.type] = new NamespaceCompiler.compiler(this);
         this.compilers[EntityCompiler.type] = new EntityCompiler.compiler(this);
+        this.compilers[RestProcessor.type] = new RestProcessor.processor(this);
 
         if (!this._validate()) {
             return;

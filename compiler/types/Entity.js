@@ -1,8 +1,8 @@
 module.exports = function () {
 	'use strict';
 	this.$type = 'entity';
-	this.$name = null;
-	this.$parent = null;
+	this.$name = undefined;
+	this.$parent = undefined;
 
 	this.getNamespace = function () {
 		return this.$parent.$namespace;
