@@ -104,9 +104,9 @@ var Tests1 = function () {
         var expected = fs.readFileSync('tests1-test3-expected.json', 'utf8');
         var testResult = res.toString() === expected &&
                 res.errorsToStringArray().toString() === [
-                        'Error[E9738] at f2.ns1.ns2.e1: Duplicated entity.',
-                        'Error[E9738] at f2.ns1.e2: Duplicated entity.',
-                        'Error[E9738] at f2.e3: Duplicated entity.',
+                        'Error[E9738] at f2.ns1.ns2.e1: Duplicated entity \'e1\'.',
+                        'Error[E9738] at f2.ns1.e2: Duplicated entity \'e2\'.',
+                        'Error[E9738] at f2.e3: Duplicated entity \'e3\'.',
                         'Warning[W2430] at f2.ns1.ns2.e1.properties: Unused node',
                         'Warning[W2430] at f2.ns1.e2.properties: Unused node',
                         'Warning[W2430] at f2.e3.properties: Unused node'
@@ -131,7 +131,7 @@ var Tests1 = function () {
         var expected = fs.readFileSync('tests1-test4-expected.json', 'utf8');
         var testResult = res.toString() === expected &&
                 res.errorsToStringArray().toString() === [
-                        'Error[E9738] at f1.ns1.e1.properties.f5.properties.f55: Duplicated entity.',
+                        'Error[E9738] at f1.ns1.e1.properties.f5.properties.f55: Duplicated entity \'e1_f5\'.',
                         'Warning[W2430] at f1.ns1.e1.properties.f5.properties.f55.properties: Unused node'
                 ].toString();
         return testResult;

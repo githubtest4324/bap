@@ -73,7 +73,7 @@
         "e3": {
             "$type": "entity",
             "$name": "e3",
-            "$parent": "Namespace: ",
+            "$parent": "Namespace: default",
             "f3": {
                 "$type": "str",
                 "$name": "f3",
@@ -84,7 +84,7 @@
         "e6": {
             "$type": "entity",
             "$name": "e6",
-            "$parent": "Namespace: ",
+            "$parent": "Namespace: default",
             "f6": {
                 "$type": "str",
                 "$name": "f6",

@@ -18,6 +18,10 @@ module.exports = function () {
 	this.$parent = null;
 
 	this.toString = function () {
-		return "Namespace: {0}".format(this.$namespace);
+	    if(this.$isDefault){
+	        return "Namespace: default";
+	    } else{
+	        return "Namespace: {0}".format(this.$namespace);
+	    }
 	};
 };

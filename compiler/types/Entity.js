@@ -7,4 +7,8 @@ module.exports = function () {
 	this.getNamespace = function () {
 		return this.$parent.$namespace;
 	};
+
+	this.toString = function(){
+        return "Entity: {0}".format(this.$name);
+    };
 };

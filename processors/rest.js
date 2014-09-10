@@ -16,6 +16,7 @@ module.exports = function () {
     'use strict';
     this.$type = 'rest';
     this.$name = undefined;
+    this.$url = undefined;
     this.$parent = undefined;
     this.$input = new RestProperty(this);
     this.$output = new RestProperty(this);
@@ -23,5 +24,10 @@ module.exports = function () {
     this.getNamespace = function () {
         return this.$parent.$namespace;
     };
+    
+    this.toString = function(){
+        return "Rest: {0}".format(this.$name);
+    };
+    
 };
 

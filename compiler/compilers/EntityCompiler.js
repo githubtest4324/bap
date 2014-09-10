@@ -11,16 +11,17 @@ module.exports = {
         this.compile = function (srcNode, parent) {
             this._compile(srcNode, parent);
         };
-        this.compileInlineEntity = function(srcNode, parent, entityName){
-            this._compile(srcNode, parent, entityName);
+        this.compileInlineEntity = function(srcNode, parent, prefferedEntityName){
+            var name = this._compile(srcNode, parent, prefferedEntityName);
+            return name;
         };
         
-        this._compile = function (srcNode, parent, entityNameOverride) {
+        this._compile = function (srcNode, parent, prefferedEntityName) {
             srcNode.meta.used = true;
             srcNode.get('type').meta.used = true;
-            var name = this._getEntityName(srcNode, entityNameOverride);
+            var name = this._getEntityName(srcNode, prefferedEntityName);
             if (!this._validate(srcNode, parent, name)) {
-                return;
+                return name;
             }
 
             var res = new Entity();
@@ -70,14 +71,15 @@ module.exports = {
                     }
                 }
             });
+            return name;
         };
 
-        this._getEntityName = function(srcNode, entityNameOverride){
+        this._getEntityName = function(srcNode, prefferedEntityName){
             if(srcNode.has('name')){
                 srcNode.get('name').meta.used = true;
                 return srcNode.get('name').value;
-            } else if(entityNameOverride){
-                return entityNameOverride;
+            } else if(prefferedEntityName){
+                return prefferedEntityName;
             } else{
                 return srcNode.key;
             }
@@ -87,7 +89,7 @@ module.exports = {
             var valid = true;
 
             if (parent[entityName]) {
-                this.compiler.error('E9738', srcNode.path, "Duplicated entity.");
+                this.compiler.error('E9738', srcNode.path, "Duplicated entity '{0}'.".format(entityName));
                 valid = false;
             }
 

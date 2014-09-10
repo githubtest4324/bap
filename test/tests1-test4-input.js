@@ -38,8 +38,13 @@ module.exports = {
                             properties: {
                                 f541: 'str'
                             }
-                        }
-                    }
+                        },
+                        f56 : {
+                            type: 'entity',
+                            properties: {
+                                f541: 'str'
+                            }
+                        }                    }
                 }
             }
         }

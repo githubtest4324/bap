@@ -105,12 +105,12 @@ module.exports = function Compiler (sourceFileNameParam, sourceParam, resultPara
         this.result.errors.push(new BapError(code, this.sourceFileName, path, message));
     };
 
-    this.expandInlineEntity = function (nameSpaceStr, entityName, entityNode) {
+    this.expandInlineEntity = function (nameSpaceStr, prefferedEntityName, entityNode) {
 //        var entityName = "{0}_{1}".format(namePrefix, this._randomInlineName());
 
         var namespace = this.getCompiledElement(nameSpaceStr);
         var entityProcessor = this.compilers[this.primitives.entity];
-        entityProcessor.compileInlineEntity(entityNode, namespace, entityName);
+        var entityName = entityProcessor.compileInlineEntity(entityNode, namespace, prefferedEntityName);
         
         return entityName;
     };

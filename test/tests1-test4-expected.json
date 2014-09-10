@@ -67,21 +67,38 @@
                 "$computed": false
             },
             "f54": {
-                "$type": "e1_f5_f54",
+                "$type": "F54Ent",
                 "$name": "f54",
                 "$translate": "f54",
                 "$computed": false
             },
             "f55": {
-                "$type": "e1_f5_f55",
+                "$type": "e1_f5",
                 "$name": "f55",
                 "$translate": "f55",
+                "$computed": false
+            },
+            "f56": {
+                "$type": "e1_f5_f56",
+                "$name": "f56",
+                "$translate": "f56",
                 "$computed": false
             }
         },
         "F54Ent": {
             "$type": "entity",
             "$name": "F54Ent",
+            "$parent": "Namespace: ns1",
+            "f541": {
+                "$type": "str",
+                "$name": "f541",
+                "$translate": "f541",
+                "$computed": false
+            }
+        },
+        "e1_f5_f56": {
+            "$type": "entity",
+            "$name": "e1_f5_f56",
             "$parent": "Namespace: ns1",
             "f541": {
                 "$type": "str",
