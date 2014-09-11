@@ -137,6 +137,46 @@ var Tests1 = function () {
         return testResult;
     };
 
+    // rest services
+    this.test5 = function () {
+        var bap = new Bap([
+            {
+                fileName : 'f1',
+                content : require('./tests1-test5-input')
+            }
+        ]);
+
+        var res = bap.compile();
+        if (false) {
+            console.log(res.toString());
+            console.log(res.errorsToStringArray());
+        }
+        var expected = fs.readFileSync('tests1-test5-expected.json', 'utf8');
+        var testResult = res.toString() === expected &&
+                res.errorsToStringArray().toString() === [ 'Error[E9738] at f1.ns1.rest1.input: Duplicated entity \'ent1\'.',
+                                                           'Error[E7182] at f1.ns1.rest3.output: Only strings or complex object allowed.',
+                                                           'Error[E7182] at f1.ns1.rest4.input: Only strings or complex object allowed.',
+                                                           'Error[E0304] at f1.ns1.rest4: Output is missing.',
+                                                           'Error[E7210] at f1.ns1.rest5: Url is missing.',
+                                                           'Error[E4223] at f1.ns1.rest5: Input is missing.',
+                                                           'Error[E0304] at f1.ns1.rest5: Output is missing.',
+                                                           'Error[E9906] at f1.ns1.rest6.input: \'type\' is missing.',
+                                                           'Error[E0304] at f1.ns1.rest6: Output is missing.',
+                                                           'Warning[W2430] at f1.ns1.rest1.input.properties: Unused node',
+                                                           'Warning[W2430] at f1.ns1.rest1.input.p2: Unused node',
+                                                           'Warning[W2430] at f1.ns1.rest2.p3: Unused node',
+                                                           'Warning[W2430] at f1.ns1.rest2.input.p2: Unused node',
+                                                           'Warning[W2430] at f1.ns1.rest2.output.p1: Unused node',
+                                                           'Warning[W2430] at f1.ns1.rest3.url: Unused node',
+                                                           'Warning[W2430] at f1.ns1.rest3.input: Unused node',
+                                                           'Warning[W2430] at f1.ns1.rest3.output: Unused node',
+                                                           'Warning[W2430] at f1.ns1.rest4.url: Unused node',
+                                                           'Warning[W2430] at f1.ns1.rest4.input: Unused node',
+                                                           'Warning[W2430] at f1.ns1.rest6.url: Unused node',
+                                                           'Warning[W2430] at f1.ns1.rest6.input: Unused node' ].toString();
+        return testResult;
+    };
+
 };
 
 module.exports = function () {

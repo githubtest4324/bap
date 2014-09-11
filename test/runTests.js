@@ -17,6 +17,8 @@ function runTests() {
     console.log('tests1/test3: ' + passed(res));
     res = tests1.test4();
     console.log('tests1/test4: ' + passed(res));
+    res = tests1.test5();
+    console.log('tests1/test5: ' + passed(res));
 }
 
 

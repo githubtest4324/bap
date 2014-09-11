@@ -1,0 +1,104 @@
+{
+    "ns1": {
+        "$type": "namespace",
+        "$isDefault": false,
+        "$namespace": "ns1",
+        "$name": "ns1",
+        "$parent": "root",
+        "ent1": {
+            "$type": "entity",
+            "$name": "ent1",
+            "$parent": "Namespace: ns1",
+            "e1_f1": {
+                "$type": "str",
+                "$name": "e1_f1",
+                "$translate": "e1_f1",
+                "$computed": false
+            }
+        },
+        "rest1": {
+            "$type": "rest",
+            "$name": "rest1",
+            "$url": "url1",
+            "$parent": "Namespace: ns1",
+            "$input": {
+                "$type": "ent1",
+                "$parent": "Rest: rest1"
+            },
+            "$output": {
+                "$type": "list",
+                "$itemType": "str",
+                "$parent": "Rest: rest1"
+            }
+        },
+        "rest2": {
+            "$type": "rest",
+            "$name": "rest2",
+            "$url": "url2",
+            "$parent": "Namespace: ns1",
+            "$input": {
+                "$type": "rest2_input",
+                "$parent": "Rest: rest2"
+            },
+            "$output": {
+                "$type": "rest2_output",
+                "$parent": "Rest: rest2"
+            }
+        },
+        "rest2_input": {
+            "$type": "entity",
+            "$name": "rest2_input",
+            "$parent": "Namespace: ns1",
+            "f1": {
+                "$type": "str",
+                "$name": "f1",
+                "$translate": "f1",
+                "$computed": false
+            }
+        },
+        "rest2_output": {
+            "$type": "entity",
+            "$name": "rest2_output",
+            "$parent": "Namespace: ns1",
+            "f1": {
+                "$type": "rest2_output_f1",
+                "$name": "f1",
+                "$translate": "f1",
+                "$computed": false
+            }
+        },
+        "rest2_output_f1": {
+            "$type": "entity",
+            "$name": "rest2_output_f1",
+            "$parent": "Namespace: ns1",
+            "f2": {
+                "$type": "str",
+                "$name": "f2",
+                "$translate": "f2",
+                "$computed": false
+            }
+        }
+    },
+    "defaultNamespace": {
+        "$type": "namespace",
+        "$isDefault": true,
+        "$namespace": "",
+        "$name": "",
+        "$parent": "root",
+        "rest0": {
+            "$type": "rest",
+            "$name": "rest0",
+            "$url": "url0",
+            "$parent": "Namespace: default",
+            "$input": {
+                "$type": "str",
+                "$parent": "Rest: rest0"
+            },
+            "$output": {
+                "$type": "list",
+                "$itemType": "str",
+                "$parent": "Rest: rest0"
+            }
+        }
+    }
+}
