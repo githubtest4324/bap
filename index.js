@@ -1,16 +1,11 @@
-var Bap = new function () {
+module.exports = function (loggerParam) {
     'use strict';
 
-    var jsType = require('./utils/JsType');
-    var stringUtils = require('./utils/StringUtils');
-    var Log = require('./BapLog');
+    var Log = require('./log');
     var fsPath = require('path');
     var fs = require('fs');
     var Jef = require('json-easy-filter');
-    // Install prototype methods
-    jsType.installPrototypeHas();
-    jsType.installPrototypeTypeOf();
-    stringUtils.installPrototypeFormat();
+    var su = require('./utils/string-utils');
 
     var DslInput = function () {
         var pub = {};
@@ -22,13 +17,13 @@ var Bap = new function () {
 
     
     var pub = {}, priv = {};
-    priv.logger = console;
+    priv.logger = loggerParam || console;
+    priv.log = new Log(priv.logger);
     /**
-     * List of DslInput objects.
+     * Holds input files as DslInput objects.
      */
     priv.dslInput = [];
 
-    priv.log = [];
 
     pub.generate = function (dslInputParam, logger) {
         priv.logger = logger || console;
@@ -43,7 +38,6 @@ var Bap = new function () {
             ];
         }
 
-
         dslInputParam.forEach(function (item) {
             var input = new DslInput();
             if (item.typeOf() === 'string') {
@@ -54,6 +48,8 @@ var Bap = new function () {
                 try{
                     input.content = JSON.parse(fs.readFileSync(filePath, 'utf8'));
                     priv.dslInput.push(input);
+                } catch(error){
+                    priv.log.error(9445, su.format("Could not open file '%s'", filePath));
                 }
             } else if(item.typeOf()==='object'){
                 // content
@@ -72,43 +68,25 @@ var Bap = new function () {
     priv.validateInputContent = function(input){
         return new Jef(input).validate(function(node){
             if(!node.has('name')){
-                priv.log.push(new Log('E', '5792', 'Wrong input format. Missing file name.'));
+                priv.log.error(5792, 'Wrong input format. Missing file name.');
                 return false;
             }
             if(node.get('name').getType()!=='string'){
-                priv.log.push(new Log('E', '3466', 'Wrong input format. File name must be textual.'));
+                priv.log.error(3466, 'Wrong input file name format.');
                 return false;
             }
             if(!node.has('dsl')){
-                priv.log.push(new Log('E', '3012', 'Wrong input format. Missing dsl.'));
+                priv.log.error(3012, 'Wrong input format. Missing dsl.');
                 return false;
             }
             if(node.get('dsl').getType()!=='object'){
-                priv.log.push(new Log('E', '2980', 'Wrong input format. Dsl must be an object.'));
+                priv.log.error(2980, 'Wrong input format. Dsl must be an object.');
                 return false;
             }
             
         });
     };
 
-    // ///////////////////////////////
-    // Private properties
-    // ///////////////////////////////
-
-    /**
-     * @returns {CompilationResult}
-     */
-    this.compile = function () {
-        var result = new BapCompilationResult();
-        var that = this;
-        this._sources.forEach(function (source) {
-            var compiler = new Compiler(source.fileName, source.content, result, that._logger);
-            compiler.compile();
-        });
-        return result;
-    };
-
     return pub;
 };
 
-module.exports = Bap;

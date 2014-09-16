@@ -1,16 +1,15 @@
-module.exports = {
-	logFieldIdentifier: function(path, srcFileName){
-		'use strict';
-		var fileIdentifier;
-		if(path && srcFileName){
-			fileIdentifier = "{0}.{1}".format(srcFileName, path);
-		} else if(path){
-			fileIdentifier = path;
-		} else if(srcFileName){
-			fileIdentifier = srcFileName;
-		} else {
-			fileIdentifier = '';
-		}
-		return fileIdentifier;
-	}
+var Utils = function () {
+    'use strict';
+    var pub = {};
+
+    /**
+     * Returns one of 'string', 'array', 'object', 'function', 'number', 'boolean', 'null', 'undefined'.
+     */
+    pub.type =function (obj) {
+        return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+    };
+    
+    return pub;
 };
+
+module.exports = new Utils();
