@@ -1,4 +1,4 @@
-var LogMessage = require('log_message');
+var LogMessage = require('./log_message');
 
 module.exports = function(loggerParam){
     'use strict';
@@ -19,9 +19,21 @@ module.exports = function(loggerParam){
         priv.logs.push(new LogMessage('info', code, message, origin1, origin2));
     };
     
-    pub.pringLogs = function(){
+    pub.pring = function(){
         priv.logs.forEach(function(logMessage){
             priv.logger.log(logMessage.toString());
         });
     };
+    
+    pub.toStringArray = function(){
+        var res = [];
+        if (priv.logs.length > 0) {
+            priv.logs.forEach(function (logMessage) {
+                res.push(logMessage.toString());
+            });
+        }
+        return res;
+    };
+    
+    return pub;
 };

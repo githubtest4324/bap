@@ -1,11 +1,12 @@
-module.exports = function (loggerParam) {
+module.exports = function (dslInputParam, loggerParam) {
     'use strict';
 
     var Log = require('./log');
     var fsPath = require('path');
     var fs = require('fs');
     var Jef = require('json-easy-filter');
-    var su = require('./utils/string-utils');
+    var su = require('./utils/string');
+    var u = require('./utils/utils');
 
     var DslInput = function () {
         var pub = {};
@@ -25,14 +26,18 @@ module.exports = function (loggerParam) {
     priv.dslInput = [];
 
 
-    pub.generate = function (dslInputParam, logger) {
+    pub.generate = function (logger) {
         priv.logger = logger || console;
-
-        priv.parseInput(dslInputParam);
+    };
+    pub.getLogs = function(){
+        return priv.log.toStringArray();
+    };
+    pub.printLogs = function(){
+        priv.log.print();
     };
 
     priv.parseInput = function (dslInputParam) {
-        if (dslInputParam.typeOf() !== 'array') {
+        if (u.type(dslInputParam) !== 'array') {
             dslInputParam = [
                 dslInputParam
             ];
@@ -40,7 +45,7 @@ module.exports = function (loggerParam) {
 
         dslInputParam.forEach(function (item) {
             var input = new DslInput();
-            if (item.typeOf() === 'string') {
+            if (u.type(item) === 'string') {
                 // file path
                 var filePath = fsPath.normalize(item);
                 input.filePath = fsPath.dirname(filePath);
@@ -51,13 +56,15 @@ module.exports = function (loggerParam) {
                 } catch(error){
                     priv.log.error(9445, su.format("Could not open file '%s'", filePath));
                 }
-            } else if(item.typeOf()==='object'){
+            } else if(u.type(item)==='object'){
                 // content
                 if(priv.validateInputContent(item)){
                     input.fileName = item.name;
                     input.content = item.content;
                     priv.dslInput.push(input);
                 }
+            } else{
+                priv.log.error(2429, su.format("Invalid input '%s'", item));
             }
         });
     };
@@ -86,6 +93,9 @@ module.exports = function (loggerParam) {
             
         });
     };
+
+    // Constructor
+    priv.parseInput(dslInputParam);
 
     return pub;
 };

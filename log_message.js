@@ -1,6 +1,6 @@
-var su = require('./utils/string_utils');
+var su = require('./utils/string');
 
-module.exports = function LogMessage (typeParam, codeParam, messageParam, origin1Param, origin2Param) {
+module.exports = function(typeParam, codeParam, messageParam, origin1Param, origin2Param) {
     'use strict';
     var pub = {}, priv = {};
     /**
@@ -30,7 +30,12 @@ module.exports = function LogMessage (typeParam, codeParam, messageParam, origin
     priv.validate();
 
     pub.toString = function () {
-        return su.format('%s[%s] at %s: %s', su.camelCase(priv.type), priv.userCode(), priv.chainOrigin(), priv.message);
+        var origin = priv.chainOrigin();
+        if(origin){
+            return su.format('%s[%s] at %s: %s', su.pascalCase(priv.type), priv.userCode(), origin, priv.message);
+        } else{
+            return su.format('%s[%s]: %s', su.pascalCase(priv.type), priv.userCode(), priv.message);
+        }
     };
 
     priv.chainOrigin = function () {
@@ -48,7 +53,10 @@ module.exports = function LogMessage (typeParam, codeParam, messageParam, origin
     };
     
     priv.userCode = function(){
-        return su.format("%s%s", su.camelCase(priv.type), su.code);
+        var type = priv.type? priv.type.charAt(0).toUpperCase(): '';
+        return su.format("%s%s", type, priv.code);
     };
+    
+    return pub;
 
 };
