@@ -19,6 +19,20 @@ var StringUtils = function () {
         return nodeUtils.format.apply(null, args);
     };
 
+    pub.ellipsis = function (string, max) {
+        max = max || 10;
+        if (string.length > max) {
+            return string.substring(0, max) + '...';
+        } else {
+            return string;
+        }
+    };
+
+    pub.pretty = function (json, indentation) {
+        indentation = indentation || 0;
+        return JSON.stringify(json, null, indentation);
+    };
+
     return pub;
 };
 
