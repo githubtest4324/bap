@@ -81,6 +81,18 @@ var Ts1 = function () {
         return testResult;
     };
 
+    // no input
+    pub.test5 = function () {
+        var bap = new Bap();
+        var res = bap.getLogs();
+        if (false) {
+            tu.printArray(res);
+        }
+        var testResult = res.toString() === [
+            "Error[E5416]: No input received"
+        ].toString();
+        return testResult;
+    };
     return pub;
 };
 

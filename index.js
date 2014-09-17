@@ -12,7 +12,7 @@ module.exports = function (dslInputParam, loggerParam) {
         var pub = {};
         pub.filePath = undefined;
         pub.fileName = undefined;
-        pub.content = undefined;
+        pub.dsl = undefined;
         return pub;
     };
 
@@ -23,9 +23,13 @@ module.exports = function (dslInputParam, loggerParam) {
      * Holds input files as DslInput objects.
      */
     priv.dslInput = [];
-
+    priv.config = undefined;
+    priv.dsl = {};
+    
+    
     pub.generate = function (logger) {
         priv.logger = logger || console;
+        priv.mergeDslInput();
     };
     pub.getLogs = function () {
         return priv.log.toStringArray();
@@ -34,7 +38,61 @@ module.exports = function (dslInputParam, loggerParam) {
         priv.log.print();
     };
 
+    /**
+     * Populates priv.dsl with sections received in priv.dslInput.
+     */
+    priv.mergeDslInput = function(){
+        priv.dslInput.forEach(function(input){
+            var jef = new Jef(input.dsl);
+            priv._validateInput(input, jef);
+        });
+    };
+    
+    /**
+     * Validates the root of each individual input file.
+     */
+    priv._validateInput = function (input, jef) {
+        var root = input.dsl;
+        var res = true;
+
+        // dsl cannot be empty
+        TODO aici am ramas
+        if(jef.isEmpty()){
+            priv.log.error(1311, 'Dsl is empty', input.fileName);
+            res = false;
+        }
+        
+        // 'type' not allowed as root element.
+        if (root.type) {
+            priv.log.error(2943, '"type" is not allowed as top level element', input.fileName);
+            res = false;
+        }
+
+        // only objects allowed as direct children
+        var that = this;
+        var onlyChildObjects = jef.validate(function (node) {
+            var valid = true;
+            if (node.level === 1) {
+                if (node.getType() !== 'object') {
+                    valid = false;
+                    that.error(5763, "Only complex objects allowed as root elements.", input.fileName, node.path);
+                }
+            }
+            return valid;
+        });
+        if (!onlyChildObjects) {
+            res = false;
+        }
+
+        return res;
+    };
+
+    
     priv.parseInput = function (dslInputParam) {
+        if(!dslInputParam){
+            priv.log.error(5416, su.format("No input received"));
+            return;
+        }
         if (u.type(dslInputParam) !== 'array') {
             dslInputParam = [
                 dslInputParam
@@ -49,7 +107,7 @@ module.exports = function (dslInputParam, loggerParam) {
                 input.filePath = fsPath.dirname(filePath);
                 input.fileName = fsPath.basename(filePath);
                 try {
-                    input.content = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+                    input.dsl = JSON.parse(fs.readFileSync(filePath, 'utf8'));
                     priv.dslInput.push(input);
                 } catch (error) {
                     priv.log.error(9445, su.format("Could not open file '%s'", filePath));
@@ -58,7 +116,7 @@ module.exports = function (dslInputParam, loggerParam) {
                 // content
                 if (priv.validateInputContent(item)) {
                     input.fileName = item.name;
-                    input.content = item.content;
+                    input.dsl = item.dsl;
                     priv.dslInput.push(input);
                 }
             } else {
