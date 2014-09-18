@@ -7,6 +7,7 @@ module.exports = function (dslInputParam, loggerParam) {
     var Jef = require('json-easy-filter');
     var su = require('./utils/string');
     var u = require('./utils/utils');
+    var Merge = require('./merge_dsl');
 
     var DslInput = function () {
         var pub = {};
@@ -43,23 +44,23 @@ module.exports = function (dslInputParam, loggerParam) {
      */
     priv.mergeDslInput = function(){
         priv.dslInput.forEach(function(input){
-            var jef = new Jef(input.dsl);
-            priv._validateInput(input, jef);
+            if(priv.validateInput(input)){
+                var merge = new Merge(priv.dsl, input);
+                merge.merge();
+            }
         });
     };
     
     /**
      * Validates the root of each individual input file.
      */
-    priv._validateInput = function (input, jef) {
-        var root = input.dsl;
+    priv.validateInput = function (input) {
+        var root = input.dsl.value;
         var res = true;
 
-        // dsl cannot be empty
-        TODO aici am ramas
-        if(jef.isEmpty()){
-            priv.log.error(1311, 'Dsl is empty', input.fileName);
-            res = false;
+        // ignore empty dsl
+        if(input.dsl.isEmpty()){
+            return true;
         }
         
         // 'type' not allowed as root element.
@@ -107,20 +108,32 @@ module.exports = function (dslInputParam, loggerParam) {
                 input.filePath = fsPath.dirname(filePath);
                 input.fileName = fsPath.basename(filePath);
                 try {
-                    input.dsl = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+                    input.dsl = new Jef(JSON.parse(fs.readFileSync(filePath, 'utf8')));
                     priv.dslInput.push(input);
                 } catch (error) {
                     priv.log.error(9445, su.format("Could not open file '%s'", filePath));
                 }
             } else if (u.type(item) === 'object') {
-                // content
+                // dsl
                 if (priv.validateInputContent(item)) {
                     input.fileName = item.name;
-                    input.dsl = item.dsl;
+                    input.dsl = new Jef(JSON.parse(JSON.stringify(item.dsl)));
+                    priv.removeComments(input.dsl);
                     priv.dslInput.push(input);
                 }
             } else {
                 priv.log.error(2429, su.format("Invalid input '%s'", item));
+            }
+        });
+    };
+    
+    /**
+     * Everything starting with '//' will be removed.
+     */
+    priv.removeComments = function (dsl) {
+        dsl.delete(function (node) {
+            if (node.key && node.key.indexOf('//') >= 0) {
+                return node;
             }
         });
     };
@@ -145,10 +158,8 @@ module.exports = function (dslInputParam, loggerParam) {
             priv.log.error(2980, 'Wrong input format. Dsl must be an object.', su.ellipsis(su.pretty(input), 30));
             return false;
         }
-        return new Jef(input).validate(function (node) {
-            if (node.level === 0) {
-            }
-        });
+        
+        return true;
     };
 
     // Constructor
