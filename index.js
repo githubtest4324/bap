@@ -31,6 +31,8 @@ module.exports = function (dslInputParam, loggerParam) {
     pub.generate = function (logger) {
         priv.logger = logger || console;
         priv.mergeDslInput();
+        
+        console.log(su.pretty(priv.dsl));
     };
     pub.getLogs = function () {
         return priv.log.toStringArray();
@@ -71,7 +73,7 @@ module.exports = function (dslInputParam, loggerParam) {
 
         // only objects allowed as direct children
         var that = this;
-        var onlyChildObjects = jef.validate(function (node) {
+        var onlyChildObjects = input.dsl.validate(function (node) {
             var valid = true;
             if (node.level === 1) {
                 if (node.getType() !== 'object') {

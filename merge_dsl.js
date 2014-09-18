@@ -2,16 +2,16 @@ var Metadata = require('./metadata');
 
 /**
  * Merges inputDsl into mainDsl.
- * @param mainDslParam Destination del.
- * @param inputDslParam Source dsl. Has DslInput type.
+ * @param dslParam Destination dsl.
+ * @param inputParam Source dsl. Has DslInput type.
  */
-module.exports = function(mainDslParam, inputDslParam){
+module.exports = function(dslParam, inputParam){
     'use strict';
     var pub = {}, priv = {};
-    priv.mainDsl = mainDslParam;
-    priv.inputDsl = inputDslParam;
+    priv.input = dslParam;
+    priv.dsl = inputParam;
     pub.merge = function(){
-        TODO aici am ramas
+        priv
     };
 };
 
