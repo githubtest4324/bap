@@ -145,7 +145,7 @@ module.exports = function Compiler (sourceFileNameParam, sourceParam, resultPara
         var onlyChildObjects = this._jefSrc.validate(function (node) {
             var valid = true;
             if (node.level === 1) {
-                if (node.getType() !== JsType.OBJECT) {
+                if (node.type() !== JsType.OBJECT) {
                     valid = false;
                     that.error('E5763', node.path, "Only complex objects allowed as root elements.");
                 }

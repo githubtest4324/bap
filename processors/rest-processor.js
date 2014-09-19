@@ -29,7 +29,7 @@ module.exports = {
          */
         this._compileIO = function (parent, restProp, srcProp) {
             srcProp.meta.used = true;
-            if (srcProp.getType() === 'string') {
+            if (srcProp.type() === 'string') {
                 restProp.$type = srcProp.value;
             } else {
                 srcProp.get('type').meta.used = true;
@@ -87,14 +87,14 @@ module.exports = {
         this._validateIO = function (node) {
             var valid = true;
 
-            if (node.getType() !== 'string' && node.getType() !== 'object') {
+            if (node.type() !== 'string' && node.type() !== 'object') {
                 this.compiler.error('E7182', node.path, "Only strings or complex object allowed.");
                 valid = false;
-            } else if (node.getType() === 'object') {
+            } else if (node.type() === 'object') {
                 if (!node.has('type')) {
                     this.compiler.error('E9906', node.path, "'type' is missing.");
                     valid = false;
-                } else if (node.get('type').getType() !== 'string') {
+                } else if (node.get('type').type() !== 'string') {
                     this.compiler.error('E9877', node.path, "'type' must be a string.");
                     valid = false;
                 }

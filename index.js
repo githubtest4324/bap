@@ -49,6 +49,7 @@ module.exports = function (dslInputParam, loggerParam) {
             if(priv.validateInput(input)){
                 var merge = new Merge(priv.dsl, input);
                 merge.merge();
+                priv.dsl = new Jef(priv.dsl.value); // Refresh metadata
             }
         });
     };
@@ -76,7 +77,7 @@ module.exports = function (dslInputParam, loggerParam) {
         var onlyChildObjects = input.dsl.validate(function (node) {
             var valid = true;
             if (node.level === 1) {
-                if (node.getType() !== 'object') {
+                if (node.type() !== 'object') {
                     valid = false;
                     that.error(5763, "Only complex objects allowed as root elements.", input.fileName, node.path);
                 }
@@ -133,7 +134,7 @@ module.exports = function (dslInputParam, loggerParam) {
      * Everything starting with '//' will be removed.
      */
     priv.removeComments = function (dsl) {
-        dsl.delete(function (node) {
+        dsl.remove(function (node) {
             if (node.key && node.key.indexOf('//') >= 0) {
                 return node;
             }

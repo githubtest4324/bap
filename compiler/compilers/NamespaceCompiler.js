@@ -69,7 +69,7 @@ module.exports = {
 			var res = srcNode.validate(function (node, local) {
 				var valid = true;
 				if (local.level === 1) {
-					if (node.getType() !== JsType.OBJECT) {
+					if (node.type() !== JsType.OBJECT) {
 						valid = false;
 						that.compiler.error('E8695', node.path, "Only complex objects allowed as namespace elements.");
 					}

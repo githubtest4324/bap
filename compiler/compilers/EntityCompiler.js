@@ -38,7 +38,7 @@ module.exports = {
                     res[prop.key] = property;
                     property.$name = prop.key;
 
-                    if (prop.getType() === JsType.STRING) {
+                    if (prop.type() === JsType.STRING) {
                         // inline property
                         property.$type = prop.value;
                         property.$translate = prop.key;
@@ -53,11 +53,11 @@ module.exports = {
                             // expanded property
                             property.$type = prop.value.type;
                             prop.get('type').meta.used = true;
-                            if (prop.has('itemType') && prop.get('itemType').getType() === JsType.STRING) {
+                            if (prop.has('itemType') && prop.get('itemType').type() === JsType.STRING) {
                                 prop.get('itemType').meta.used = true;
                                 property.$itemType = prop.value.itemType;
                             }
-                            if (prop.has('readOnly') && prop.get('readOnly').getType() === JsType.BOOLEAN) {
+                            if (prop.has('readOnly') && prop.get('readOnly').type() === JsType.BOOLEAN) {
                                 prop.get('readOnly').meta.used = true;
                                 property.$readOnly = prop.value.readOnly;
                             }
@@ -97,7 +97,7 @@ module.exports = {
             if (!srcNode.has('properties')) {
                 this.compiler.error('E7784', srcNode.path, "Entity is missing 'properties'");
                 valid = false;
-            } else if (srcNode.get('properties').getType() !== JsType.OBJECT) {
+            } else if (srcNode.get('properties').type() !== JsType.OBJECT) {
                 this.compiler.error('E4085', srcNode.path, "Invalid entity properties.");
                 valid = false;
             } else {
@@ -106,7 +106,7 @@ module.exports = {
                 srcNode.get('properties').validate(function (node, local) {
                     if (local.level === 1) {
                         if (node.isLeaf) {
-                            if (node.getType() !== JsType.STRING) {
+                            if (node.type() !== JsType.STRING) {
                                 that.compiler.error('E3238', node.path, "Invalid field type.");
                                 valid = false;
                             }
@@ -136,11 +136,11 @@ module.exports = {
             // valid = false;
             // }
             // }
-            // if(!(node.getType()===JsType.STRING ||
-            // node.getType()===JsType.OBJECT)){
+            // if(!(node.type()===JsType.STRING ||
+            // node.type()===JsType.OBJECT)){
             // this.compiler.error('E7599', node.path, "Invalid type '{0}'. Only
             // object or string is allowed as field
-            // definition.".format(srcNode.get('properties').getType())));
+            // definition.".format(srcNode.get('properties').type())));
             // valid = false;
             // }
             // if(node.getType===JsType.OBJECT){

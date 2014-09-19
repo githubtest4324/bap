@@ -10,5 +10,5 @@ module.exports = function(){
 	/**
 	 * Origin file name of this node. Used mostly for logging.
 	 */
-	this.fileName = 'N/A';
+	this.origin = 'N/A';
 };
