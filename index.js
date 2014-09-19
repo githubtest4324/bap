@@ -10,46 +10,45 @@ module.exports = function (dslInputParam, loggerParam) {
     var Merge = require('./merge_dsl');
 
     var DslInput = function () {
-        var pub = {};
-        pub.filePath = undefined;
-        pub.fileName = undefined;
-        pub.dsl = undefined;
-        return pub;
+        this.filePath = undefined;
+        this.fileName = undefined;
+        this.dsl = undefined;
+        return this;
     };
 
-    var pub = {}, priv = {};
-    priv.logger = loggerParam || console;
-    priv.log = new Log(priv.logger);
+    var priv = {};
+    var logger = loggerParam || console;
+    var log = new Log(priv.logger);
     /**
      * Holds input files as DslInput objects.
      */
-    priv.dslInput = [];
-    priv.config = undefined;
-    priv.dsl = {};
+    var dslInput = [];
+    var config = undefined;
+    var dsl = {};
     
     
-    pub.generate = function (logger) {
-        priv.logger = logger || console;
-        priv.mergeDslInput();
+    this.generate = function (logger) {
+        logger = logger || console;
+        mergeDslInput();
         
-        console.log(su.pretty(priv.dsl));
+        console.log(su.pretty(dsl));
     };
-    pub.getLogs = function () {
-        return priv.log.toStringArray();
+    this.getLogs = function () {
+        return log.toStringArray();
     };
-    pub.printLogs = function () {
-        priv.log.print();
+    this.printLogs = function () {
+        log.print();
     };
 
     /**
-     * Populates priv.dsl with sections received in priv.dslInput.
+     * Populates dsl with sections received in dslInput.
      */
-    priv.mergeDslInput = function(){
-        priv.dslInput.forEach(function(input){
-            if(priv.validateInput(input)){
-                var merge = new Merge(priv.dsl, input);
+    var mergeDslInput = function(){
+        dslInput.forEach(function(input){
+            if(validateInput(input)){
+                var merge = new Merge(dsl, input);
                 merge.merge();
-                priv.dsl = new Jef(priv.dsl.value); // Refresh metadata
+                dsl = new Jef(dsl.value); // Refresh metadata
             }
         });
     };
@@ -57,7 +56,7 @@ module.exports = function (dslInputParam, loggerParam) {
     /**
      * Validates the root of each individual input file.
      */
-    priv.validateInput = function (input) {
+    var validateInput = function (input) {
         var root = input.dsl.value;
         var res = true;
 
@@ -68,7 +67,7 @@ module.exports = function (dslInputParam, loggerParam) {
         
         // 'type' not allowed as root element.
         if (root.type) {
-            priv.log.error(2943, '"type" is not allowed as top level element', input.fileName);
+            log.error(2943, '"type" is not allowed as top level element', input.fileName);
             res = false;
         }
 
@@ -92,9 +91,9 @@ module.exports = function (dslInputParam, loggerParam) {
     };
 
     
-    priv.parseInput = function (dslInputParam) {
+    var parseInput = function (dslInputParam) {
         if(!dslInputParam){
-            priv.log.error(5416, su.format("No input received"));
+            log.error(5416, su.format("No input received"));
             return;
         }
         if (u.type(dslInputParam) !== 'array') {
@@ -112,20 +111,20 @@ module.exports = function (dslInputParam, loggerParam) {
                 input.fileName = fsPath.basename(filePath);
                 try {
                     input.dsl = new Jef(JSON.parse(fs.readFileSync(filePath, 'utf8')));
-                    priv.dslInput.push(input);
+                    dslInput.push(input);
                 } catch (error) {
-                    priv.log.error(9445, su.format("Could not open file '%s'", filePath));
+                    log.error(9445, su.format("Could not open file '%s'", filePath));
                 }
             } else if (u.type(item) === 'object') {
                 // dsl
-                if (priv.validateInputContent(item)) {
+                if (validateInputContent(item)) {
                     input.fileName = item.name;
                     input.dsl = new Jef(JSON.parse(JSON.stringify(item.dsl)));
-                    priv.removeComments(input.dsl);
-                    priv.dslInput.push(input);
+                    removeComments(input.dsl);
+                    dslInput.push(input);
                 }
             } else {
-                priv.log.error(2429, su.format("Invalid input '%s'", item));
+                log.error(2429, su.format("Invalid input '%s'", item));
             }
         });
     };
@@ -133,7 +132,7 @@ module.exports = function (dslInputParam, loggerParam) {
     /**
      * Everything starting with '//' will be removed.
      */
-    priv.removeComments = function (dsl) {
+    var removeComments = function (dsl) {
         dsl.remove(function (node) {
             if (node.key && node.key.indexOf('//') >= 0) {
                 return node;
@@ -144,21 +143,21 @@ module.exports = function (dslInputParam, loggerParam) {
     /**
      * Allowed format: {name: '', dsl: {}}
      */
-    priv.validateInputContent = function (input) {
+    var validateInputContent = function (input) {
         if (!input.name) {
-            priv.log.error(5792, 'Wrong input format. Missing name.', su.ellipsis(su.pretty(input), 30));
+            log.error(5792, 'Wrong input format. Missing name.', su.ellipsis(su.pretty(input), 30));
             return false;
         }
         if (u.type(input.name) !== 'string') {
-            priv.log.error(3466, 'Wrong input name format. Must be text.', su.ellipsis(su.pretty(input), 30));
+            log.error(3466, 'Wrong input name format. Must be text.', su.ellipsis(su.pretty(input), 30));
             return false;
         }
         if (!input.dsl) {
-            priv.log.error(3012, 'Wrong input format. Missing dsl.', su.ellipsis(su.pretty(input), 30));
+            log.error(3012, 'Wrong input format. Missing dsl.', su.ellipsis(su.pretty(input), 30));
             return false;
         }
         if (u.type(input.dsl) !== 'object') {
-            priv.log.error(2980, 'Wrong input format. Dsl must be an object.', su.ellipsis(su.pretty(input), 30));
+            log.error(2980, 'Wrong input format. Dsl must be an object.', su.ellipsis(su.pretty(input), 30));
             return false;
         }
         
@@ -166,7 +165,7 @@ module.exports = function (dslInputParam, loggerParam) {
     };
 
     // Constructor
-    priv.parseInput(dslInputParam);
+    parseInput(dslInputParam);
 
-    return pub;
+    return this;
 };
