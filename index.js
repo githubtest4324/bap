@@ -24,14 +24,15 @@ module.exports = function (dslInputParam, loggerParam) {
      */
     var dslInput = [];
     var config = undefined;
-    var dsl = {};
+    var dsl = new Jef({});
     
     
     this.generate = function (logger) {
         logger = logger || console;
         mergeDslInput();
         
-        console.log(su.pretty(dsl));
+        console.log(su.pretty(dsl.value));
+        log.print();
     };
     this.getLogs = function () {
         return log.toStringArray();
@@ -78,7 +79,7 @@ module.exports = function (dslInputParam, loggerParam) {
             if (node.level === 1) {
                 if (node.type() !== 'object') {
                     valid = false;
-                    that.error(5763, "Only complex objects allowed as root elements.", input.fileName, node.path);
+                    log.error(5763, "Only complex objects allowed as root elements.", input.fileName, node.path);
                 }
             }
             return valid;
@@ -91,7 +92,7 @@ module.exports = function (dslInputParam, loggerParam) {
     };
 
     
-    var parseInput = function (dslInputParam) {
+    var parseInput = function () {
         if(!dslInputParam){
             log.error(5416, su.format("No input received"));
             return;
@@ -165,7 +166,7 @@ module.exports = function (dslInputParam, loggerParam) {
     };
 
     // Constructor
-    parseInput(dslInputParam);
+    parseInput();
 
     return this;
 };

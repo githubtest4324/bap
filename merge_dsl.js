@@ -20,7 +20,7 @@ module.exports = function (dsl, input) {
 
     this.merge = function () {
         input.dsl.filter(function (node) {
-            if (node.isRoot()) {
+            if (node.isRoot) {
                 return;
             }
 
@@ -37,10 +37,11 @@ module.exports = function (dsl, input) {
             }
         });
 
+        debugger;
         changes.forEach(function (item) {
             var src = input.dsl.get(item.path);
             var dest = dsl.get(src.parent.path);
-            dest[src.key] = src.value;
+            dest.value[src.key] = src.value;
         });
 
     };

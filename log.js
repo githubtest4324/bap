@@ -18,7 +18,7 @@ module.exports = function(loggerParam){
         logs.push(new LogMessage('info', code, message, origin1, origin2));
     };
     
-    this.pring = function(){
+    this.print = function(){
         logs.forEach(function(logMessage){
             logger.log(logMessage.toString());
         });

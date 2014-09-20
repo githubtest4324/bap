@@ -1,25 +1,24 @@
 var nodeUtils = require('util');
 var StringUtils = function () {
     'use strict';
-    var pub = {};
-    pub.pascalCase = function (s) {
+    this.pascalCase = function (s) {
         return s.replace(/(\w)(\w*)/g, function (g0, g1, g2) {
             return g1.toUpperCase() + g2.toLowerCase();
         });
     };
 
-    pub.upperCase = function (s) {
+    this.upperCase = function (s) {
         return s.replace(/(\w)(\w*)/g, function (g0, g1, g2) {
             return g1.toUpperCase() + g2.toLowerCase();
         });
     };
 
-    pub.format = function () {
+    this.format = function () {
         var args = Array.prototype.slice.call(arguments, 0);
         return nodeUtils.format.apply(null, args);
     };
 
-    pub.ellipsis = function (string, max) {
+    this.ellipsis = function (string, max) {
         max = max || 10;
         if (string.length > max) {
             return string.substring(0, max) + '...';
@@ -28,12 +27,12 @@ var StringUtils = function () {
         }
     };
 
-    pub.pretty = function (json, indentation) {
-        indentation = indentation || 0;
+    this.pretty = function (json, indentation) {
+        indentation = indentation || 4;
         return JSON.stringify(json, null, indentation);
     };
 
-    return pub;
+    return this;
 };
 
 module.exports = new StringUtils();
