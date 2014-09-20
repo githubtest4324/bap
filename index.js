@@ -146,19 +146,19 @@ module.exports = function (dslInputParam, loggerParam) {
      */
     var validateInputContent = function (input) {
         if (!input.name) {
-            log.error(5792, 'Wrong input format. Missing name.', su.ellipsis(su.pretty(input), 30));
+            log.error(5792, 'Wrong input format. Missing name.', su.ellipsis(su.pretty(input, 0), 30));
             return false;
         }
         if (u.type(input.name) !== 'string') {
-            log.error(3466, 'Wrong input name format. Must be text.', su.ellipsis(su.pretty(input), 30));
+            log.error(3466, 'Wrong input name format. Must be text.', su.ellipsis(su.pretty(input, 0), 30));
             return false;
         }
         if (!input.dsl) {
-            log.error(3012, 'Wrong input format. Missing dsl.', su.ellipsis(su.pretty(input), 30));
+            log.error(3012, 'Wrong input format. Missing dsl.', su.ellipsis(su.pretty(input, 0), 30));
             return false;
         }
         if (u.type(input.dsl) !== 'object') {
-            log.error(2980, 'Wrong input format. Dsl must be an object.', su.ellipsis(su.pretty(input), 30));
+            log.error(2980, 'Wrong input format. Dsl must be an object.', su.ellipsis(su.pretty(input, 0), 30));
             return false;
         }
         
