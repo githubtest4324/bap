@@ -37,7 +37,6 @@ module.exports = function (dsl, input) {
             }
         });
 
-        debugger;
         changes.forEach(function (item) {
             var src = input.dsl.get(item.path);
             var dest = dsl.get(src.parent.path);
