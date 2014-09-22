@@ -24,6 +24,7 @@ module.exports = function () {
     }
     
     var mergeTwo = function (dest, src) {
+        debugger;
         var changes = [];
         src.filter(function (node) {
             if (node.isRoot) {
@@ -35,7 +36,6 @@ module.exports = function () {
             if (!dest.get(node.path)) {
                 var change = new Change(node.path, node.value);
                 changes.push(change);
-                node.skip = true;
                 node.filter(function (child) {
                     child.skip = true;
                 });
@@ -43,7 +43,7 @@ module.exports = function () {
         });
         changes.forEach(function (item) {
             var srcNode = src.get(item.path);
-            var destNode = dest.get(src.parent.path);
+            var destNode = dest.get(srcNode.parent.path);
             destNode.value[srcNode.key] = srcNode.value;
         });
     };
