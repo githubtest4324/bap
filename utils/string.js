@@ -28,7 +28,7 @@ var StringUtils = function () {
     };
 
     this.pretty = function (json, indentation) {
-        indentation = indentation || 4;
+        indentation = indentation === undefined ? 4 : indentation;
         return JSON.stringify(json, null, indentation);
     };
 

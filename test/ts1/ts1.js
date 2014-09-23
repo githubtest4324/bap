@@ -4,9 +4,8 @@ var tu = require('../utils');
 // initialization tests
 var Ts1 = function () {
     'use strict';
-    var pub = {};
     // invalid input - numeric
-    pub.test1 = function () {
+    this.test1 = function () {
         var bap = new Bap(332);
         var res = bap.getLogs();
         if (false) {
@@ -19,7 +18,7 @@ var Ts1 = function () {
     };
 
     // invalid input - file does not exist
-    pub.test2 = function () {
+    this.test2 = function () {
         var bap = new Bap('wrong file');
         var res = bap.getLogs();
         if (false) {
@@ -32,7 +31,7 @@ var Ts1 = function () {
     };
 
     // invalid input - file does not exist
-    pub.test3 = function () {
+    this.test3 = function () {
         var bap = new Bap([
                 'wrong file', true
         ]);
@@ -47,7 +46,7 @@ var Ts1 = function () {
     };
 
     // invalid input - objects
-    pub.test4 = function () {
+    this.test4 = function () {
         var input = [
                 {}, {
                     x : 'y'
@@ -82,7 +81,7 @@ var Ts1 = function () {
     };
 
     // no input
-    pub.test5 = function () {
+    this.test5 = function () {
         var bap = new Bap();
         var res = bap.getLogs();
         if (false) {
@@ -93,7 +92,7 @@ var Ts1 = function () {
         ].toString();
         return testResult;
     };
-    return pub;
+    return this;
 };
 
 module.exports = new Ts1();
