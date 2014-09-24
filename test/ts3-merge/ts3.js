@@ -139,7 +139,39 @@ var Ts3 = function () {
             "a8" : "a2",
             "a9" : 3,
             "a10" : true,
-            "a11" : []
+            "a11" : [],
+            "a12" : null,
+            "a13" : null
+        });
+        return testResult;
+    };
+    // null is always overridden
+    this.test31 = function () {
+        var d1 = {
+            a1 : {
+                b1 : 'b1'
+            },
+            a12 : null,
+            a13 : null,
+        };
+        var d2 = {
+            a1 : null,
+            a14 : null,
+            a15 : null
+        };
+        var res = merge(d1, d2);
+
+        if (false) {
+            console.log(JSON.stringify(res.value, null, 4));
+        }
+        var testResult = JSON.stringify(res.value) === JSON.stringify({
+            "a1" : {
+                "b1" : "b1"
+            },
+            "a12" : null,
+            "a13" : null,
+            "a14" : null,
+            "a15" : null
         });
         return testResult;
     };
@@ -271,9 +303,9 @@ var Ts3 = function () {
             console.log(JSON.stringify(res.value, null, 4));
         }
         var testResult = JSON.stringify(res.value) === JSON.stringify({
-            "a1": "a1",
-            "a2": {
-                "c1": "c1"
+            "a1" : "a1",
+            "a2" : {
+                "c1" : "c1"
             }
         });
         return testResult;

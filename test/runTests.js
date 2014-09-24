@@ -28,6 +28,8 @@ function runTests() {
     console.log('test2: ' + passed(res));
     res = ts3.test3();
     console.log('test3: ' + passed(res));
+    res = ts3.test31();
+    console.log('test31: ' + passed(res));
     res = ts3.test4();
     console.log('test4: ' + passed(res));
     res = ts3.test5();
