@@ -311,6 +311,47 @@ var Ts3 = function () {
         return testResult;
     };
 
+    // callback 
+    this.test8 = function () {
+        var d1 = {
+                a1: 10,
+                b1: {
+                    c1: 100
+                },
+                c1: 30
+        };
+        var d2 = {
+            a1 : 20,
+            b1 : {
+                c1: 30,
+                c2: 15
+            },
+            c1 : 60,
+            d1: 30
+        };
+        var res = merge(d1, d2, function(context){
+            if(context.conflict && context.src.type()==='number' && context.dst.type()==='number'){
+                context.update(context.dst.value+context.src.value);
+            } else{
+                context.useDefault();
+            }
+        });
+
+        if (false) {
+            console.log(JSON.stringify(res.value, null, 4));
+        }
+        var testResult = JSON.stringify(res.value) === JSON.stringify({
+            "a1": 30,
+            "b1": {
+                "c1": 130,
+                "c2": 15
+            },
+            "c1": 90,
+            "d1": 30
+        });
+        return testResult;
+    };
+
     return this;
 };
 

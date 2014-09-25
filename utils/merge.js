@@ -3,17 +3,105 @@ var Jef = require('json-easy-filter');
 /**
  * Merges multiple json objects. 
  * Conflict resolution: 
- * -scalars override each other
- * -scalar and arrays override each other 
+ * -primitives override each other
+ * -primitive and arrays override each other 
  * -objects and arrays override each other
- * -scalar and objects override each other 
+ * -primitive and objects override each other 
  * -arrays are concatenated 
  * -objects are recursively merged 
  * -null is always overridden
+ * -null never overrides
  */
 module.exports = function () {
     'use strict';
 
+    var mergeTwo = function (dstRoot, srcRoot) {
+        srcRoot.filter(function (node) {
+            if (!node.isRoot) {
+                var context = new Context(dstRoot, node);
+                if (callback) {
+                    callback(context);
+                } else {
+                    context.useDefault();
+                }
+            }
+        });
+    };
+
+    var Context = function (dstRootParam, srcParam) {
+        this.src = srcParam;
+        this.dstRoot = dstRootParam;
+        this.dst = this.dstRoot.get(this.src.path);
+        this.conflict = this.dst && !this.src.skip ? true : false;
+
+        this.skipChildren = function () {
+            this.src.filter(function (child) {
+                child.skip = true;
+            });
+        };
+        /**
+         * Returns 'primitive', 'array', 'object', 'null'
+         */
+        this.getMergeType = function (node) {
+            switch (node.type()) {
+            case 'number':
+            case 'string':
+            case 'boolean':
+                return 'primitive';
+            case 'null':
+                return 'null';
+            case 'array':
+                return 'array';
+            default:
+                return 'object';
+            }
+        };
+
+        this.update = function (value) {
+            var parentDest = this.dstRoot.get(this.src.parent.path);
+//            if(!parentDest) debugger;
+            parentDest.value[this.src.key] = JSON.parse(JSON.stringify(value));
+            parentDest.refresh();
+        };
+
+        /**
+         * Things to avoid in custom implementations:
+         * * Always use update() and delete(). Don't change directly node.value because this will not actually change the value in the json object.
+         */
+        this.useDefault = function () {
+            if (this.src.skip) {
+                return;
+            }
+            if (!this.conflict) {
+                // no conflict - objects are recursively merged
+                this.update(this.src.value);
+                this.skipChildren();
+            } else {
+                // conflict
+                var tsrc = this.getMergeType(this.src);
+                var tdest = this.getMergeType(this.dst);
+                if (tsrc === 'null') {
+                    // null never overrides
+                } else if (tsrc === 'array' && tdest === 'array') {
+                    // arrays are concatenated 
+                    this.update(this.dst.value.concat(this.src.value));
+                    this.skipChildren();
+                } else if (tsrc === 'object' && tdest === 'object') {
+                    // objects are recursively merged
+                } else {
+                    // primitives override each other
+                    // primitive and arrays override each other 
+                    // objects and arrays override each other
+                    // primitive and objects override each other
+                    // null is always overridden
+                    this.update(this.src.value);
+                    this.skipChildren();
+                }
+            }
+        };
+    };
+
+    // Constructor
     var callback;
     var input = [];
     for (var i = 0; i < arguments.length; i++) {
@@ -26,71 +114,6 @@ module.exports = function () {
             input.push(new Jef(arg));
         }
     }
-
-    var mergeTwo = function (dstRoot, srcRoot) {
-        srcRoot.filter(function (node) {
-            if (!node.isRoot && !node.skip) {
-                var destNode = dstRoot.get(node.path);
-                var parentDest = dstRoot.get(node.parent.path);
-                if (!destNode) {
-                    // no conflict - objects are recursively merged
-                    parentDest.value[node.key] = node.value;
-                    node.filter(function (child) {
-                        child.skip = true;
-                    });
-                } else {
-                    // conflict
-                    var tsrc = getType(node);
-                    var tdest = getType(destNode);
-                    if (tsrc === 'null') {
-                        // null is always overridden
-                    } else if (tsrc === 'array' && tdest === 'array') {
-                        // arrays are concatenated 
-                        parentDest.value[node.key] = parentDest.value[node.key].concat(node.value);
-                        node.filter(function (child) {
-                            child.skip = true;
-                        });
-                    } else if (tsrc === 'object' && tdest === 'object') {
-                        // objects are recursively merged
-                    } else {
-                        // scalars override each other
-                        // scalar and arrays override each other 
-                        // objects and arrays override each other
-                        // scalar and objects override each other 
-                        parentDest.value[node.key] = node.value;
-                        node.filter(function (child) {
-                            child.skip = true;
-                        });
-                    }
-                }
-                if (callback) {
-                    callback({
-                        srcNode : node,
-                        dstNode : parentDest.get(node.key),
-                        conflict : false
-                    });
-                }
-            }
-        });
-    };
-
-    /**
-     * Returns 'scalar', 'array', 'object', 'null'
-     */
-    var getType = function (node) {
-        switch (node.type()) {
-        case 'number':
-        case 'string':
-        case 'boolean':
-            return 'scalar';
-        case 'null':
-            return 'null';
-        case 'array':
-            return 'array';
-        default:
-            return 'object';
-        }
-    };
 
     var res;
     if (input.length === 0) {
