@@ -29,14 +29,17 @@ module.exports = function () {
     };
 
     var Context = function (dstRootParam, srcParam) {
+        var skipdefault = 'skip_42839';
         this.src = srcParam;
         this.dstRoot = dstRootParam;
         this.dst = this.dstRoot.get(this.src.path);
-        this.conflict = this.dst && !this.src.skip ? true : false;
-
-        this.skipChildren = function () {
-            this.src.filter(function (child) {
-                child.skip = true;
+        this.conflict = this.dst && !this.src[skipdefault] ? true : false;
+        /**
+         * Used defaultMerge() to skip nodes
+         */
+        var skipDefault = function (node) {
+            node.filter(function (child) {
+                child[skipdefault] = true;
             });
         };
         /**
@@ -57,25 +60,28 @@ module.exports = function () {
             }
         };
 
+        /**
+         * Updates destination.
+         */
         this.update = function (value) {
             var parentDest = this.dstRoot.get(this.src.parent.path);
-//            if(!parentDest) debugger;
             parentDest.value[this.src.key] = JSON.parse(JSON.stringify(value));
             parentDest.refresh();
         };
 
         /**
-         * Things to avoid in custom implementations:
-         * * Always use update() and delete(). Don't change directly node.value because this will not actually change the value in the json object.
+         * Things to remember in custom merging:
+         * Always use update() and delete(). Don't change directly node.value because this will not actually change the value in the json object.
+         * Use context.dst only when context.conflict is true.
          */
         this.useDefault = function () {
-            if (this.src.skip) {
+            if (this.src[skipdefault]) {
                 return;
             }
             if (!this.conflict) {
                 // no conflict - objects are recursively merged
                 this.update(this.src.value);
-                this.skipChildren();
+                skipDefault(this.src);
             } else {
                 // conflict
                 var tsrc = this.getMergeType(this.src);
@@ -85,7 +91,7 @@ module.exports = function () {
                 } else if (tsrc === 'array' && tdest === 'array') {
                     // arrays are concatenated 
                     this.update(this.dst.value.concat(this.src.value));
-                    this.skipChildren();
+                    skipDefault(this.src);
                 } else if (tsrc === 'object' && tdest === 'object') {
                     // objects are recursively merged
                 } else {
@@ -95,7 +101,7 @@ module.exports = function () {
                     // primitive and objects override each other
                     // null is always overridden
                     this.update(this.src.value);
-                    this.skipChildren();
+                    skipDefault(this.src);
                 }
             }
         };

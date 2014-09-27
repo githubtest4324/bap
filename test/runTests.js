@@ -39,7 +39,13 @@ function runTests() {
     res = ts3.test7();
     console.log('test7: ' + passed(res));
     res = ts3.test8();
-    console.log('test7: ' + passed(res));
+    console.log('test8: ' + passed(res));
+    res = ts3.test9();
+    console.log('test9: ' + passed(res));
+    res = ts3.test10();
+    console.log('test10: ' + passed(res));
+    res = ts3.test11();
+    console.log('test11: ' + passed(res));
 }
 
 

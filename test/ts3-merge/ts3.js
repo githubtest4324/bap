@@ -311,28 +311,28 @@ var Ts3 = function () {
         return testResult;
     };
 
-    // callback 
+    // callback
     this.test8 = function () {
         var d1 = {
-                a1: 10,
-                b1: {
-                    c1: 100
-                },
-                c1: 30
+            a1 : 10,
+            b1 : {
+                c1 : 100
+            },
+            c1 : 30
         };
         var d2 = {
             a1 : 20,
             b1 : {
-                c1: 30,
-                c2: 15
+                c1 : 30,
+                c2 : 15
             },
             c1 : 60,
-            d1: 30
+            d1 : 30
         };
-        var res = merge(d1, d2, function(context){
-            if(context.conflict && context.src.type()==='number' && context.dst.type()==='number'){
-                context.update(context.dst.value+context.src.value);
-            } else{
+        var res = merge(d1, d2, function (context) {
+            if (context.conflict && context.src.type() === 'number' && context.dst.type() === 'number') {
+                context.update(context.dst.value + context.src.value);
+            } else {
                 context.useDefault();
             }
         });
@@ -341,13 +341,280 @@ var Ts3 = function () {
             console.log(JSON.stringify(res.value, null, 4));
         }
         var testResult = JSON.stringify(res.value) === JSON.stringify({
-            "a1": 30,
-            "b1": {
-                "c1": 130,
-                "c2": 15
+            "a1" : 30,
+            "b1" : {
+                "c1" : 130,
+                "c2" : 15
             },
-            "c1": 90,
-            "d1": 30
+            "c1" : 90,
+            "d1" : 30
+        });
+        return testResult;
+    };
+    // callback - conflict
+    this.test8 = function () {
+        var d1 = {
+            a1 : 1,
+            a2 : 1,
+            a3 : {
+                a4 : 'a'
+            },
+            a5 : {
+                a6 : 'a',
+                a8 : 2
+            },
+        };
+        var d2 = {
+            a1 : {
+                a2 : 1
+            },
+            a2 : 2,
+            a3 : 4,
+            a5 : {
+                a6 : 'b',
+                a7 : 'c'
+            }
+        };
+        var res = merge(d1, d2, function (context) {
+            if (context.conflict && context.src.hasType('number', 'string', 'boolean')) {
+                context.update('conflict');
+            } else {
+                context.useDefault();
+            }
+        });
+
+        if (false) {
+            console.log(JSON.stringify(res.value, null, 4));
+        }
+        var testResult = JSON.stringify(res.value) === JSON.stringify({
+            "a1" : {
+                "a2" : 1
+            },
+            "a2" : "conflict",
+            "a3" : "conflict",
+            "a5" : {
+                "a6" : "conflict",
+                "a8" : 2,
+                "a7" : "c"
+            }
+        });
+        return testResult;
+    };
+
+    // callback - primitives
+    this.test9 = function () {
+        var d1 = {
+            a1 : 1,
+            a2 : 1,
+            a3 : {
+                a4 : 'a'
+            },
+            a5 : {
+                a6 : 'a',
+                a8 : 2,
+                a10 : 5
+            },
+        };
+        var d2 = {
+            a1 : {
+                a2 : 1
+            },
+            a2 : 2,
+            a3 : 4,
+            a5 : {
+                a6 : 'b',
+                a7 : 'c',
+                a9 : 5,
+                a10 : 8
+            }
+        };
+
+        var res = merge(d1, d2, function (context) {
+            if (context.conflict && context.src.type() === 'number' && context.dst.type() === 'number') {
+                context.update(context.dst.value + context.src.value);
+            } else if (!context.conflict && context.src.type() === 'number') {
+                context.update(0);
+            } else {
+                context.useDefault();
+            }
+        });
+
+        if (false) {
+            console.log(JSON.stringify(res.value, null, 4));
+        }
+        var testResult = JSON.stringify(res.value) === JSON.stringify({
+            "a1" : {
+                "a2" : 0
+            },
+            "a2" : 3,
+            "a3" : 4,
+            "a5" : {
+                "a6" : "b",
+                "a8" : 2,
+                "a10" : 13,
+                "a7" : "c",
+                "a9" : 0
+            }
+        });
+        return testResult;
+    };
+
+    // callback - primitives conflicts
+    this.test10 = function () {
+        var d1 = {
+            a1 : {
+                a2 : {
+                    a3 : 3
+                },
+                a3 : 4,
+                a5 : {
+                    a6 : 6
+                }
+            },
+            a2 : 3,
+            a3 : {},
+            a4 : {},
+            a5 : null,
+            a6 : true,
+            a7 : 'a',
+            a8 : 6
+        };
+        var d2 = {
+            a1 : {
+                a2 : {
+                    a3 : 3
+                },
+                a3 : 4,
+                a5 : {
+                    a6 : 6
+                }
+            },
+            a2 : {},
+            a3 : 3,
+            a4 : {},
+            a5 : 'a',
+            a6 : null,
+            a7 : 5,
+            a8 : 'b'
+        };
+
+        var res = merge(d1, d2, function (context) {
+            if (context.conflict && context.src.type() !== 'object' && context.dst.type() !== 'object') {
+                context.update('conflict');
+            } else {
+                context.useDefault();
+            }
+        });
+        if (false) {
+            console.log(JSON.stringify(res.value, null, 4));
+        }
+        var testResult = JSON.stringify(res.value) === JSON.stringify({
+            "a1" : {
+                "a2" : {
+                    "a3" : "conflict"
+                },
+                "a3" : "conflict",
+                "a5" : {
+                    "a6" : "conflict"
+                }
+            },
+            "a2" : {},
+            "a3" : 3,
+            "a4" : {},
+            "a5" : "conflict",
+            "a6" : "conflict",
+            "a7" : "conflict",
+            "a8" : "conflict"
+        });
+        return testResult;
+    };
+    // callback - arrays
+    this.test11 = function () {
+        var d1 = {
+            a1 : [
+                    3, 4
+            ],
+            a2 : {
+                a3 : 5,
+                a4 : [
+                        1, 3
+                ],
+                a5 : [
+                        4, 3
+                ],
+                a6 : {
+                    a7 : 1,
+                    a8 : 3,
+                    a9 : 5
+                }
+            },
+            a8 : 5,
+            a9 : [
+                    1, 2
+            ]
+        };
+        var d2 = {
+            a1 : 2,
+            a2 : {
+                a3 : 4,
+                a4 : 8,
+                a6 : {
+                    a7 : [
+                        2
+                    ],
+                    a8 : [],
+                    a9 : {}
+                }
+            },
+            a9 : 'a'
+        };
+
+        var res = merge(d1, d2, function (context) {
+            if (context.conflict && context.src.hasType('number', 'array') && context.dst.hasType('number', 'array')) {
+                var arr1 = context.src.type() === 'array' ? context.src.value : [
+                    context.src.value
+                ];
+                var arr2 = context.dst.type() === 'array' ? context.dst.value : [
+                    context.dst.value
+                ];
+                var sum = 0;
+                var val;
+                for (var i = 0; i < arr1.length; i++) {
+                    val = arr1[i];
+                    if (typeof val === 'number') {
+                        sum += val;
+                    }
+                }
+                for (i = 0; i < arr2.length; i++) {
+                    val = arr2[i];
+                    if (typeof val === 'number') {
+                        sum += val;
+                    }
+                }
+                context.update(sum);
+            } else {
+                context.useDefault();
+            }
+        });
+        if (false) {
+            console.log(JSON.stringify(res.value, null, 4));
+        }
+        var testResult = JSON.stringify(res.value) === JSON.stringify({
+            "a1" : 9,
+            "a2" : {
+                "a3" : 9,
+                "a4" : 12,
+                "a5" : [
+                        4, 3
+                ],
+                "a6" : {
+                    "a7" : 3,
+                    "a8" : 3,
+                    "a9" : {}
+                }
+            },
+            "a8" : 5,
+            "a9" : "a"
         });
         return testResult;
     };
