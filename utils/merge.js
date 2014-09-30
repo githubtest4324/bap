@@ -1,4 +1,4 @@
-var Jef = require('json-easy-filter');
+var JefNode = require('json-easy-filter').JefNode;
 
 /**
  * Merges multiple json objects. 
@@ -114,10 +114,10 @@ module.exports = function () {
         var arg = arguments[i];
         if (typeof arg === 'function') {
             callback = arg;
-        } else if (arg instanceof Jef) {
+        } else if (arg instanceof JefNode) {
             input.push(arg);
         } else {
-            input.push(new Jef(arg));
+            input.push(new JefNode(arg));
         }
     }
 

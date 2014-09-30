@@ -4,7 +4,7 @@ module.exports = function (dslInputParam, loggerParam) {
     var Log = require('./log');
     var fsPath = require('path');
     var fs = require('fs');
-    var Jef = require('json-easy-filter');
+    var JefNode = require('json-easy-filter').JefNode;
     var su = require('./utils/string');
     var u = require('./utils/utils');
     var Merge = require('./merge_dsl');
@@ -24,7 +24,7 @@ module.exports = function (dslInputParam, loggerParam) {
      */
     var dslInput = [];
     var config = undefined;
-    var dsl = new Jef({});
+    var dsl = new JefNode({});
     
     
     this.generate = function (logger) {
@@ -49,7 +49,7 @@ module.exports = function (dslInputParam, loggerParam) {
             if(validateInput(input)){
                 var merge = new Merge(dsl, input);
                 merge.merge();
-                dsl = new Jef(dsl.value); // Refresh metadata
+                dsl = new JefNode(dsl.value); // Refresh metadata
             }
         });
     };
@@ -111,7 +111,7 @@ module.exports = function (dslInputParam, loggerParam) {
                 input.filePath = fsPath.dirname(filePath);
                 input.fileName = fsPath.basename(filePath);
                 try {
-                    input.dsl = new Jef(JSON.parse(fs.readFileSync(filePath, 'utf8')));
+                    input.dsl = new JefNode(JSON.parse(fs.readFileSync(filePath, 'utf8')));
                     dslInput.push(input);
                 } catch (error) {
                     log.error(9445, su.format("Could not open file '%s'", filePath));
@@ -120,7 +120,7 @@ module.exports = function (dslInputParam, loggerParam) {
                 // dsl
                 if (validateInputContent(item)) {
                     input.fileName = item.name;
-                    input.dsl = new Jef(JSON.parse(JSON.stringify(item.dsl)));
+                    input.dsl = new JefNode(JSON.parse(JSON.stringify(item.dsl)));
                     removeComments(input.dsl);
                     dslInput.push(input);
                 }
