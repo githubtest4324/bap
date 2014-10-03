@@ -73,6 +73,7 @@ module.exports = function () {
          * Things to remember in custom merging:
          * Always use update() and delete(). Don't change directly node.value because this will not actually change the value in the json object.
          * Use context.dst only when context.conflict is true.
+         * Dst will be changed. If this is not to happen, clone it first using maybe JSON.parse(json.stringify(dst))
          */
         this.useDefault = function () {
             if (this.src[skipdefault]) {
@@ -120,7 +121,6 @@ module.exports = function () {
             input.push(new JefNode(arg));
         }
     }
-
     var res;
     if (input.length === 0) {
         res = {};

@@ -1,49 +1,37 @@
-var Metadata = require('./metadata');
+var Meta = require('./metadata');
+var merge = require('./utils/merge');
 
 /**
  * Merges input into main dsl.
  * 
- * @param dslParam
+ * @param dsl
  *            Main dsl.
- * @param inputParam
- *            Source dsl. Has DslInput type.
+ * @param inputDsl
+ *            Source dsl. An array of DslInput type.
  */
-module.exports = function (dsl, input) {
+module.exports = function (dsl, inputDsl) {
     'use strict';
-    var changes = [];
-    var Change = function (pathParam, valueParam) {
-        this.path = pathParam;
-        this.value = valueParam;
+    var mergeInput = [];
 
-        return this;
-    };
+    // add destination
+    mergeInput.push(dsl);
+    
+    // add sources
+    inputDsl.forEach(function (input) {
+        var source = input.dsl;
+        mergeInput.push(source);
+        source.origin = input.fileName;
+    });
+    
+    // add callback
+    mergeInput.push(function(context){
+        context.useDefault();
+        var dst = dsl.get(context.src.path);
+        if(!dst.meta){
+            dst.meta = new Meta();
+        }
+        dst.meta.origins.push(context.src.root.origin);
+    });
 
-    this.merge = function () {
-        input.dsl.filter(function (node) {
-            if (node.isRoot) {
-                return;
-            }
-
-            if (node.skip) {
-                return;
-            }
-            if (!dsl.get(node.path)) {
-                var change = new Change(node.path, node.value);
-                changes.push(change);
-                node.skip = true;
-                node.filter(function (child) {
-                    child.skip = true;
-                });
-            }
-        });
-
-        changes.forEach(function (item) {
-            var src = input.dsl.get(item.path);
-            var dest = dsl.get(src.parent.path);
-            dest.value[src.key] = src.value;
-        });
-
-    };
-
-    return this;
+    merge.apply(this, mergeInput);
 };

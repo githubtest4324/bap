@@ -8,7 +8,8 @@ module.exports = function(){
 	 */
 	this.used = false;
 	/**
-	 * Origin file name of this node. Used mostly for logging.
+	 * Origin files name of this node. Used mostly for logging.
 	 */
-	this.origin = 'N/A';
+	this.origins = [];
+	
 };

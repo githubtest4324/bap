@@ -31,6 +31,14 @@ var StringUtils = function () {
         indentation = indentation === undefined ? 4 : indentation;
         return JSON.stringify(json, null, indentation);
     };
+    
+    this.tab = function(tabs){
+        var res = '';
+        while(tabs--){
+            res+='\t';
+        }
+        return res;
+    };
 
     return this;
 };

@@ -7,7 +7,7 @@ module.exports = function (dslInputParam, loggerParam) {
     var JefNode = require('json-easy-filter').JefNode;
     var su = require('./utils/string');
     var u = require('./utils/utils');
-    var Merge = require('./merge_dsl');
+    var mergeDsl = require('./merge_dsl');
 
     var DslInput = function () {
         this.filePath = undefined;
@@ -29,8 +29,9 @@ module.exports = function (dslInputParam, loggerParam) {
     
     this.generate = function (logger) {
         logger = logger || console;
-        mergeDslInput();
-        
+        // populates dsl with sections received in dslInput.
+        mergeDsl(dsl, dslInput);
+        validateInput(dsl);
         console.log(su.pretty(dsl.value));
         log.print();
     };
@@ -40,29 +41,39 @@ module.exports = function (dslInputParam, loggerParam) {
     this.printLogs = function () {
         log.print();
     };
-
-    /**
-     * Populates dsl with sections received in dslInput.
-     */
-    var mergeDslInput = function(){
-        dslInput.forEach(function(input){
-            if(validateInput(input)){
-                var merge = new Merge(dsl, input);
-                merge.merge();
-                dsl = new JefNode(dsl.value); // Refresh metadata
+    var metaToString = function(meta, tabs){
+        var res = "";
+        res+=su.tab(tabs)+'origin: '+meta.origins.toString()+'\n';
+        res+=su.tab(tabs)+'used: '+meta.used+'\n';
+        return res;
+    };
+    this.toString = function () {
+        var res = '';
+        dsl.filter(function(node){
+            if(!node.isRoot){
+                debugger;
+                var tabs = node.level -1;
+                res+=su.tab(tabs)+node.key+'\n';
+                if(node.meta){
+                    res+=metaToString(node.meta, tabs+1);
+                }
+                if(!node.hasType('object', 'array')){
+                    res+=su.tab(tabs+1)+'value: '+node.value+"\n";
+                }
             }
         });
+        return res;
     };
     
     /**
      * Validates the root of each individual input file.
      */
-    var validateInput = function (input) {
-        var root = input.dsl.value;
+    var validateInput = function () {
+        var root = dsl.value;
         var res = true;
 
         // ignore empty dsl
-        if(input.dsl.isEmpty()){
+        if(dsl.isEmpty()){
             return true;
         }
         
@@ -74,7 +85,7 @@ module.exports = function (dslInputParam, loggerParam) {
 
         // only objects allowed as direct children
         var that = this;
-        var onlyChildObjects = input.dsl.validate(function (node) {
+        var onlyChildObjects = dsl.validate(function (node) {
             var valid = true;
             if (node.level === 1) {
                 if (node.type() !== 'object') {
@@ -131,7 +142,7 @@ module.exports = function (dslInputParam, loggerParam) {
     };
     
     /**
-     * Everything starting with '//' will be removed.
+     * everything starting with '//' will be removed.
      */
     var removeComments = function (dsl) {
         dsl.remove(function (node) {
@@ -142,7 +153,7 @@ module.exports = function (dslInputParam, loggerParam) {
     };
 
     /**
-     * Allowed format: {name: '', dsl: {}}
+     * allowed format: {name: '', dsl: {}}
      */
     var validateInputContent = function (input) {
         if (!input.name) {
@@ -165,7 +176,6 @@ module.exports = function (dslInputParam, loggerParam) {
         return true;
     };
 
-    // Constructor
     parseInput();
 
     return this;

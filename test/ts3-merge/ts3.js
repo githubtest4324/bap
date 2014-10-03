@@ -618,6 +618,27 @@ var Ts3 = function () {
         });
         return testResult;
     };
+    // merge.apply()
+    this.test12 = function () {
+        
+        var input = [{a: 'b'}, {b: 'c'}];
+        merge.apply(this, input);
+        var res = input[0];
+        
+        
+        if (false) {
+            console.log(JSON.stringify(res, null, 4));
+        }
+        var testResult = JSON.stringify(res) === JSON.stringify({
+            "a": "b",
+            "b": "c"
+        });
+        return testResult;
+    };
+    
+    // todo: remove res from merge(). Change all tests to be merge(dst, src) and dst to receive the changes.
+    // todo: test circular references in src and dest
+    // todo: test merge([...], {}) or merge('a', {}), ...
 
     return this;
 };
