@@ -1,4 +1,4 @@
-module.exports = function (dslInputParam, loggerParam) {
+module.exports = function (dslInputParam) {
     'use strict';
 
     var Log = require('./log');
@@ -16,30 +16,20 @@ module.exports = function (dslInputParam, loggerParam) {
         return this;
     };
 
-    var priv = {};
-    var logger = loggerParam || console;
-    var log = new Log(priv.logger);
+    this.log = new Log();
+    this.dsl = new JefNode({});
     /**
      * Holds input files as DslInput objects.
      */
     var dslInput = [];
     var config = undefined;
-    var dsl = new JefNode({});
+    var that = this;
     
     
-    this.generate = function (logger) {
-        logger = logger || console;
+    this.generate = function () {
         // populates dsl with sections received in dslInput.
-        mergeDsl(dsl, dslInput);
-        validateInput(dsl);
-        console.log(su.pretty(dsl.value));
-        log.print();
-    };
-    this.getLogs = function () {
-        return log.toStringArray();
-    };
-    this.printLogs = function () {
-        log.print();
+        mergeDsl(this.dsl, dslInput);
+        validateInput(this.dsl);
     };
     var metaToString = function(meta, tabs){
         var res = "";
@@ -49,7 +39,7 @@ module.exports = function (dslInputParam, loggerParam) {
     };
     this.toString = function () {
         var res = '';
-        dsl.filter(function(node){
+        this.dsl.filter(function(node){
             if(!node.isRoot){
                 debugger;
                 var tabs = node.level -1;
@@ -69,28 +59,27 @@ module.exports = function (dslInputParam, loggerParam) {
      * Validates the root of each individual input file.
      */
     var validateInput = function () {
-        var root = dsl.value;
+        var root = this.dsl.value;
         var res = true;
 
         // ignore empty dsl
-        if(dsl.isEmpty()){
+        if(this.dsl.isEmpty()){
             return true;
         }
         
         // 'type' not allowed as root element.
         if (root.type) {
-            log.error(2943, '"type" is not allowed as top level element', input.fileName);
+            that.log.error(2943, '"type" is not allowed as top level element', input.fileName);
             res = false;
         }
 
         // only objects allowed as direct children
-        var that = this;
-        var onlyChildObjects = dsl.validate(function (node) {
+        var onlyChildObjects = this.dsl.validate(function (node) {
             var valid = true;
             if (node.level === 1) {
                 if (node.type() !== 'object') {
                     valid = false;
-                    log.error(5763, "Only complex objects allowed as root elements.", input.fileName, node.path);
+                    that.log.error(5763, "Only complex objects allowed as root elements.", input.fileName, node.path);
                 }
             }
             return valid;
@@ -105,7 +94,7 @@ module.exports = function (dslInputParam, loggerParam) {
     
     var parseInput = function () {
         if(!dslInputParam){
-            log.error(5416, su.format("No input received"));
+            that.log.error(5416, su.format("No input received"));
             return;
         }
         if (u.type(dslInputParam) !== 'array') {
@@ -125,7 +114,7 @@ module.exports = function (dslInputParam, loggerParam) {
                     input.dsl = new JefNode(JSON.parse(fs.readFileSync(filePath, 'utf8')));
                     dslInput.push(input);
                 } catch (error) {
-                    log.error(9445, su.format("Could not open file '%s'", filePath));
+                    that.log.error(9445, su.format("Could not open file '%s'", filePath));
                 }
             } else if (u.type(item) === 'object') {
                 // dsl
@@ -136,7 +125,7 @@ module.exports = function (dslInputParam, loggerParam) {
                     dslInput.push(input);
                 }
             } else {
-                log.error(2429, su.format("Invalid input '%s'", item));
+                that.log.error(2429, su.format("Invalid input '%s'", item));
             }
         });
     };
@@ -144,8 +133,8 @@ module.exports = function (dslInputParam, loggerParam) {
     /**
      * everything starting with '//' will be removed.
      */
-    var removeComments = function (dsl) {
-        dsl.remove(function (node) {
+    var removeComments = function (input) {
+        input.remove(function (node) {
             if (node.key && node.key.indexOf('//') >= 0) {
                 return node;
             }
@@ -157,19 +146,19 @@ module.exports = function (dslInputParam, loggerParam) {
      */
     var validateInputContent = function (input) {
         if (!input.name) {
-            log.error(5792, 'Wrong input format. Missing name.', su.ellipsis(su.pretty(input, 0), 30));
+            that.log.error(5792, 'Wrong input format. Missing name.', su.ellipsis(su.pretty(input, 0), 30));
             return false;
         }
         if (u.type(input.name) !== 'string') {
-            log.error(3466, 'Wrong input name format. Must be text.', su.ellipsis(su.pretty(input, 0), 30));
+            that.log.error(3466, 'Wrong input name format. Must be text.', su.ellipsis(su.pretty(input, 0), 30));
             return false;
         }
         if (!input.dsl) {
-            log.error(3012, 'Wrong input format. Missing dsl.', su.ellipsis(su.pretty(input, 0), 30));
+            that.log.error(3012, 'Wrong input format. Missing dsl.', su.ellipsis(su.pretty(input, 0), 30));
             return false;
         }
         if (u.type(input.dsl) !== 'object') {
-            log.error(2980, 'Wrong input format. Dsl must be an object.', su.ellipsis(su.pretty(input, 0), 30));
+            that.log.error(2980, 'Wrong input format. Dsl must be an object.', su.ellipsis(su.pretty(input, 0), 30));
             return false;
         }
         

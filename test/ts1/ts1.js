@@ -7,7 +7,7 @@ var Ts1 = function () {
     // invalid input - numeric
     this.test1 = function () {
         var bap = new Bap(332);
-        var res = bap.getLogs();
+        var res = bap.log.toStringArray();
         if (false) {
             console.log(res.toString());
         }
@@ -20,7 +20,7 @@ var Ts1 = function () {
     // invalid input - file does not exist
     this.test2 = function () {
         var bap = new Bap('wrong file');
-        var res = bap.getLogs();
+        var res = bap.log.toStringArray();
         if (false) {
             console.log(res.toString());
         }
@@ -35,7 +35,7 @@ var Ts1 = function () {
         var bap = new Bap([
                 'wrong file', true
         ]);
-        var res = bap.getLogs();
+        var res = bap.log.toStringArray();
         if (false) {
             tu.printArray(res);
         }
@@ -65,7 +65,7 @@ var Ts1 = function () {
                 }
         ];
         var bap = new Bap(input);
-        var res = bap.getLogs();
+        var res = bap.log.toStringArray();
         if (false) {
             console.log(res);
         }
@@ -83,7 +83,7 @@ var Ts1 = function () {
     // no input
     this.test5 = function () {
         var bap = new Bap();
-        var res = bap.getLogs();
+        var res = bap.log.toStringArray();
         if (false) {
             tu.printArray(res);
         }

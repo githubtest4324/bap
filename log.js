@@ -1,9 +1,8 @@
 var LogMessage = require('./log_message');
 
-module.exports = function(loggerParam){
+module.exports = function(){
     'use strict';
     var logs = [];
-    var logger = loggerParam || console;
     
     this.error = function(code, message, origin1, origin2){
         logs.push(new LogMessage('error', code, message, origin1, origin2));
@@ -16,12 +15,6 @@ module.exports = function(loggerParam){
     };
     this.info = function(code, message, origin1, origin2){
         logs.push(new LogMessage('info', code, message, origin1, origin2));
-    };
-    
-    this.print = function(){
-        logs.forEach(function(logMessage){
-            logger.log(logMessage.toString());
-        });
     };
     
     this.toStringArray = function(){
