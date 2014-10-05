@@ -22,64 +22,73 @@ module.exports = function (dslInputParam) {
      * Holds input files as DslInput objects.
      */
     var dslInput = [];
-    var config = undefined;
+    this.config = undefined;
     var that = this;
-    
-    
+
     this.generate = function () {
         // populates dsl with sections received in dslInput.
         mergeDsl(this.dsl, dslInput);
+        extractConfig();
         validateInput(this.dsl);
     };
-    var metaToString = function(meta, tabs){
-        var res = "";
-        res+=su.tab(tabs)+'origin: '+meta.origins.toString()+'\n';
-        res+=su.tab(tabs)+'used: '+meta.used+'\n';
-        return res;
+    
+    var extractConfig = function(){
+        if(that.dsl.has('dslConfig')){
+            that.config = that.dsl.get('dslConfig');
+        } else if(that.dsl.has('config')){
+            that.config = that.dsl.get('config');
+        } else{
+            that.config = new JefNode({});
+        }
     };
-    this.toString = function () {
+    this.printMeta = function () {
         var res = '';
-        this.dsl.filter(function(node){
-            if(!node.isRoot){
-                debugger;
-                var tabs = node.level -1;
-                res+=su.tab(tabs)+node.key+'\n';
-                if(node.meta){
-                    res+=metaToString(node.meta, tabs+1);
+        this.dsl.filter(function (node) {
+            if (!node.isRoot) {
+                var tabs = node.level - 1;
+                res += su.tab(tabs) + node.key + '\n';
+                if (node.meta) {
+                    res += metaToString(node.meta, tabs + 1);
                 }
-                if(!node.hasType('object', 'array')){
-                    res+=su.tab(tabs+1)+'value: '+node.value+"\n";
+                if (!node.hasType('object', 'array')) {
+                    res += su.tab(tabs + 1) + 'value: ' + node.value + "\n";
                 }
             }
         });
         return res;
     };
-    
+    var metaToString = function (meta, tabs) {
+        var res = "";
+        res += su.tab(tabs) + 'origin: ' + meta.origins.toString() + '\n';
+        res += su.tab(tabs) + 'used: ' + meta.used + '\n';
+        return res;
+    };
+
     /**
      * Validates the root of each individual input file.
      */
     var validateInput = function () {
-        var root = this.dsl.value;
+        var root = that.dsl.value;
         var res = true;
 
         // ignore empty dsl
-        if(this.dsl.isEmpty()){
+        if (that.dsl.isEmpty()) {
             return true;
         }
-        
+
         // 'type' not allowed as root element.
         if (root.type) {
-            that.log.error(2943, '"type" is not allowed as top level element', input.fileName);
+            that.log.error(2943, '"type" is not allowed as top level element', that.dsl.get('type').meta.origins.toString());
             res = false;
         }
 
         // only objects allowed as direct children
-        var onlyChildObjects = this.dsl.validate(function (node) {
+        var onlyChildObjects = that.dsl.validate(function (node) {
             var valid = true;
             if (node.level === 1) {
                 if (node.type() !== 'object') {
                     valid = false;
-                    that.log.error(5763, "Only complex objects allowed as root elements.", input.fileName, node.path);
+                    that.log.error(5763, "Only complex objects allowed as root elements.", node.meta.origins.toString(), node.path);
                 }
             }
             return valid;
@@ -91,9 +100,8 @@ module.exports = function (dslInputParam) {
         return res;
     };
 
-    
     var parseInput = function () {
-        if(!dslInputParam){
+        if (!dslInputParam) {
             that.log.error(5416, su.format("No input received"));
             return;
         }
@@ -129,7 +137,7 @@ module.exports = function (dslInputParam) {
             }
         });
     };
-    
+
     /**
      * everything starting with '//' will be removed.
      */
@@ -161,7 +169,7 @@ module.exports = function (dslInputParam) {
             that.log.error(2980, 'Wrong input format. Dsl must be an object.', su.ellipsis(su.pretty(input, 0), 30));
             return false;
         }
-        
+
         return true;
     };
 

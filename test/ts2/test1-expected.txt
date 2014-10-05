@@ -1,0 +1,50 @@
+ns1
+	origin: f1,f2
+	used: false
+	a1
+		origin: f1
+		used: false
+		value: a1
+	ns5
+		origin: f1,f2
+		used: false
+		a5
+			origin: f1
+			used: false
+			value: a4
+		a6
+			origin: f2
+			used: false
+			value: a6
+	a2
+		origin: f2
+		used: false
+		value: a2
+	ns6
+		origin: f2
+		used: false
+		a7
+			origin: f2
+			used: false
+			value: a7
+ns2
+	origin: f1
+	used: false
+	a2
+		origin: f1
+		used: false
+		value: a2
+	ns4
+		origin: f1
+		used: false
+		a4
+			origin: f1
+			used: false
+			value: a4
+ns3
+	origin: f2
+	used: false
+	a3
+		origin: f2
+		used: false
+		value: a3
