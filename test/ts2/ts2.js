@@ -1,4 +1,4 @@
-var Bap = require('../../index');
+var Bap = require('../../index').Bap;
 var fs = require('fs');
 
 // mergeDslInput() tests

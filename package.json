@@ -10,7 +10,8 @@
   "keywords": [
   ],
   "dependencies" :{
-	"json-easy-filter" : "0.3.0"
+	"json-easy-filter" : "0.3.0",
+	"class.extend": "0.9.1"
   },
   "author": "",
   "license": "MIT"
