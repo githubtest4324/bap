@@ -1,12 +1,19 @@
-var Class = require('class.extend');
-var Generator = Class.extend({
-    init : function (bap) {
-        'use strict';
-        this.bap = bap;
-    }
-});
+var BaseGen = function(){
+    'use strict';
+    this.context=undefined;
+    this.name=undefined;
+    this.version=undefined;
+    this.dependencies = [];
+    this.init= function (context) {
+        this.context = context;
+    };
+    this.model = function () {
+    };
+    this.generate = function () {
+    };
+};
 module.exports = {
-    Generator : Generator,
+        BaseGen : BaseGen,
     Bap : function (dslInputParam) {
         'use strict';
 
@@ -17,7 +24,8 @@ module.exports = {
         var su = require('./utils/string');
         var u = require('./utils/utils');
         var mergeDsl = require('./merge_dsl');
-
+        var Meta = require('./metadata');
+        
         var DslInput = function () {
             this.filePath = undefined;
             this.fileName = undefined;
@@ -82,7 +90,7 @@ module.exports = {
             if (GeneratorClass) {
                 try {
                     var generator = new GeneratorClass(that);
-                    if (!generator instanceof Generator) {
+                    if (!generator instanceof BaseGen) {
                         that.log.error(2001, su.format('"%s" is not instance of Generator.', generatorName), generatorNode.meta.origins);
                     }
                     return generator;
@@ -102,6 +110,7 @@ module.exports = {
                 that.config = that.dsl.get('config');
             } else {
                 that.config = new JefNode({});
+                that.config.meta = new Meta();
             }
         };
         this.printMeta = function () {

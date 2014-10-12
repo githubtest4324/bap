@@ -49,7 +49,9 @@ var Ts2 = function () {
             console.log(res2);
         }
         var res2Expected = fs.readFileSync(__dirname + '/test1-expected.txt', 'utf8');
-        var testResult = res1.toString() === [].toString() && res2 === res2Expected;
+        var testResult = res1.toString() === [
+            'Warn[W3846] at : No generators defined.'
+        ].toString() && res2 === res2Expected;
         return testResult;
     };
     // dsl validation - error
@@ -74,7 +76,8 @@ var Ts2 = function () {
         }
         var testResult = res1.toString() === [
                 'Error[E2943] at f1,f2: "type" is not allowed as top level element',
-                'Error[E5763] at f1,f2.type: Only complex objects allowed as root elements.'
+                'Error[E5763] at f1,f2.type: Only complex objects allowed as root elements.',
+                'Warn[W3846] at : No generators defined.'
         ].toString();
         return testResult;
     };

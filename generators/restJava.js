@@ -1,21 +1,18 @@
-var Generator = require('../index').Generator;
+var BaseGen = require('../index').BaseGen;
 var name = 'restJava';
-var generator = function(){
+module.exports = function () {
     'use strict';
-    return Generator.extend({
-        name: name,
-        version : '0.0.1',
-        dependencies : [],
-        init : function (bap) {
-            this._super(bap);
-            this.config = bap.config.get(name);
-        },
-        model : function () {
-        },
-        generate : function () {
+    this.name = name;
+    this.version = '0.0.1';
+    this.init = function (bap) {
+        this._super(bap);
+        this.config = bap.config.get(name);
+    };
+    this.model = function () {
+    };
+    this.generate = function () {
 
-        }
-    });
+    };
 };
+module.exports.prototype = new BaseGen();
 
-module.exports = generator();
