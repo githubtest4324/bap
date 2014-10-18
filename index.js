@@ -49,6 +49,14 @@ module.exports = {
             extractConfig();
             validateInput(this.dsl);
             extractGenerators();
+            // Model
+            this.generators.forEach(function (generator){
+                generator.model();
+            });
+            // Generate
+            this.generators.forEach(function (generator){
+                generator.generate();
+            });
         };
 
         var extractGenerators = function () {
@@ -63,6 +71,7 @@ module.exports = {
                         that.log.warn(8263, 'Generator config wrong format.', node.meta.origins);
                     } else {
                         var generator = resolveGenerator(node);
+                        generator.init(that);
                         if (generator) {
                             that.generators.push(generator);
                         } else {
