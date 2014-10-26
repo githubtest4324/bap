@@ -25,6 +25,7 @@ module.exports = {
         var u = require('./utils/utils');
         var mergeDsl = require('./merge_dsl');
         var Meta = require('./metadata');
+        var buildModel = require('./modelBuilder');
         
         var DslInput = function () {
             this.filePath = undefined;
@@ -49,6 +50,7 @@ module.exports = {
             extractConfig();
             validateInput(this.dsl);
             extractGenerators();
+            buildModel(that);
             // Model
             this.generators.forEach(function (generator){
                 generator.model();
@@ -154,7 +156,63 @@ module.exports = {
             });
 
             return res;
-        }
+        };
+        
+        this.printModel = function(){
+            var res = "";
+            for(var key in this.model){
+                var entity = this.model[key];
+                if(typeof entity.type ==='object'){
+                    res+=su.format("%s\n", key);
+                    for(var keyType in entity.type){
+                        var type = entity.type[keyType];
+                        res+=su.format("\t%s: %s\n", keyType, type);
+                    }
+                } else if(entity.type instanceof Array){
+                    res+=su.format("%s: [%s]\n", key, entity.type[0]);
+                } else if(typeof entity.type === 'string'){
+                    res+=su.format("%s: %s\n", key, entity.type);
+                }
+            }
+            return res;
+        };
+        /**
+         * Returns the namespace of specified dsl node.
+         */
+        this.getNamespace  = function(node){
+            var path = [];
+            while(!node.isRoot){
+                path.push(node);
+                node=node.parent;
+            }
+            var namespace = "";
+            // iterate from root to node
+            for(var i = path.length-1; i>=0; i--){
+                node = path[i];
+                var isns = isNamespace(node);
+                if(isns){
+                    if(namespace){
+                        namespace+='.'+node.key;
+                    }else{
+                        namespace+=node.key;
+                    }
+                } else{
+                    break;
+                }
+            }
+            return namespace;
+        };
+        
+        var isNamespace = function(node){
+            var res = true;
+            node.filterFirst(function(child){
+                // a namespace is formed only by objects
+                if(child.hasType('string', 'number', 'boolean')){
+                    res = false;
+                }
+            });
+            return res;
+        };
 
         /**
          * Validates the root of each individual input file.
