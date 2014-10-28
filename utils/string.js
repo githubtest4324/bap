@@ -1,6 +1,6 @@
-var nodeUtils = require('util');
 var StringUtils = function () {
     'use strict';
+    var sprintf = require('sprintf-js').sprintf;
     this.pascalCase = function (s) {
         return s.replace(/(\w)(\w*)/g, function (g0, g1, g2) {
             return g1.toUpperCase() + g2.toLowerCase();
@@ -15,7 +15,7 @@ var StringUtils = function () {
 
     this.format = function () {
         var args = Array.prototype.slice.call(arguments, 0);
-        return nodeUtils.format.apply(null, args);
+        return sprintf.apply(null, args);
     };
 
     this.ellipsis = function (string, max) {

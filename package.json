@@ -11,7 +11,7 @@
   ],
   "dependencies" :{
 	"json-easy-filter" : "0.3.0",
-	"class.extend": "0.9.1"
+	"sprintf-js" : "1.0.2"
   },
   "author": "",
   "license": "MIT"

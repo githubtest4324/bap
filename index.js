@@ -37,6 +37,7 @@ module.exports = {
         this.log = new Log();
         this.dsl = new JefNode({});
         this.generators = [];
+        this.model = {};
         /**
          * Holds input files as DslInput objects.
          */
@@ -162,14 +163,19 @@ module.exports = {
             var res = "";
             for(var key in this.model){
                 var entity = this.model[key];
-                if(typeof entity.type ==='object'){
+                if(entity.type instanceof Array){
+                    res+=su.format("%s: list(%s)\n", key, entity.type[0]);
+                } else if(typeof entity.type ==='object'){
                     res+=su.format("%s\n", key);
                     for(var keyType in entity.type){
+                        debugger;
                         var type = entity.type[keyType];
-                        res+=su.format("\t%s: %s\n", keyType, type);
+                        if(type instanceof Array){
+                            res+=su.format("\t%s: list(%s)\n", keyType, type);
+                        } else{
+                            res+=su.format("\t%s: %s\n", keyType, type);
+                        }
                     }
-                } else if(entity.type instanceof Array){
-                    res+=su.format("%s: [%s]\n", key, entity.type[0]);
                 } else if(typeof entity.type === 'string'){
                     res+=su.format("%s: %s\n", key, entity.type);
                 }

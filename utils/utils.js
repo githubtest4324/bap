@@ -1,15 +1,21 @@
 var Utils = function () {
     'use strict';
-    var pub = {};
+    var sprintf = require('sprintf-js').sprintf;
 
     /**
-     * Returns one of 'string', 'array', 'object', 'function', 'number', 'boolean', 'null', 'undefined'.
+     * Returns one of 'string', 'array', 'object', 'function', 'number',
+     * 'boolean', 'null', 'undefined'.
      */
-    pub.type =function (obj) {
+    this.type = function (obj) {
         return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
     };
-    
-    return pub;
+
+    /**
+     * Generates four random digits.
+     */
+    this.random = function () {
+        return sprintf('%04d', Math.floor(Math.random() * 9999));
+    }
 };
 
 module.exports = new Utils();

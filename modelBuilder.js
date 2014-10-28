@@ -1,5 +1,6 @@
 module.exports = function (bap) {
     'use strict';
+    var u = require('./utils/utils');
 
     var isPrimitive = function (type) {
         return [
@@ -18,15 +19,17 @@ module.exports = function (bap) {
     // extracts model and returns its qualified name
     var extractModel = function (node, namePrefix) {
         var model = {};
-        debugger;
         // namespace
         model.namespace = bap.getNamespace(node);
 
         // name
-        if (node.has('name') && node.get('name').type === 'string') {
-            model.name = node.get('name');
+        if (node.has('name') && node.get('name').type() === 'string') {
+            model.name = node.get('name').value;
         } else {
-            model.name = "" + namePrefix + node.key;
+            model.name = namePrefix ? namePrefix + node.key : node.key;
+        }
+        if(bap.model[model.namespace + '.' + model.name]){
+            model.name+=u.random();
         }
 
         // qualified name
@@ -34,11 +37,11 @@ module.exports = function (bap) {
 
         // type
         if (node.has('properties') && node.get('properties').type() === 'object') {
-            model.type = extractProperties(node.get('properties'));
+            model.type = extractProperties(node.get('properties'), model.name);
         } else if (node.has('type') && node.get('type').type() === 'string') {
             model.type = extractType(node.get('type').value);
         } else {
-            bap.log.warning(4399, 'Neityer suitable type or properties found to build a model', node.meta.origins.toString());
+            bap.log.warn(4399, 'Neityer suitable type or properties found to build a model', node.meta.origins.toString());
         }
         bap.model[model.qualifiedName] = model;
         return model.qualifiedName;
@@ -57,14 +60,13 @@ module.exports = function (bap) {
         }
     };
 
-    var extractProperties = function (properties) {
-        debugger;
+    var extractProperties = function (properties, entityName) {
         var type = {};
         properties.filterFirst(function (node) {
             if (node.type() === 'string') {
                 type[node.key] = extractType(node.value);
             } else if (node.type() === 'object') {
-                var qualifiedName = extractModel(node);
+                var qualifiedName = extractModel(node, entityName);
                 type[node.key] = qualifiedName;
             }
         });
