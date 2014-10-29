@@ -81,6 +81,24 @@ var Ts2 = function () {
         ].toString();
         return testResult;
     };
+    // model generation
+    this.test3 = function () {
+        var bap = new Bap(require('./test3-input'));
+        bap.generate();
+        var res1 = bap.log.toStringArray();
+        var res2 = bap.printModel();
+        if (false) {
+            console.log(res1);
+            console.log(res2);
+        }
+        var res2Expected = fs.readFileSync(__dirname + '/test3-expected.txt', 'utf8');
+        var testResult1 = res1.toString() === [
+                'Warn[W3846] at : No generators defined.', 'Warn[W4399] at f1.ns1.E2: No suitable type or properties found to build a model'
+        ].toString();
+
+        var testResult2 = res2 === res2Expected;
+        return testResult1 && testResult2;
+    };
 
     return this;
 };

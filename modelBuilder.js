@@ -1,7 +1,8 @@
 module.exports = function (bap) {
     'use strict';
-    var u = require('./utils/utils');
+    var su = require('./utils/string');
 
+    var duplicatedModelNo = 0;
     var isPrimitive = function (type) {
         return [
                 'int', 'number', 'double', 'float', 'bool', 'string', 'decimal', 'date', 'time', 'datetime'
@@ -29,7 +30,7 @@ module.exports = function (bap) {
             model.name = namePrefix ? namePrefix + node.key : node.key;
         }
         if(bap.model[model.namespace + '.' + model.name]){
-            model.name+=u.random();
+            model.name+=su.format("%03d", duplicatedModelNo++);
         }
 
         // qualified name
@@ -41,7 +42,7 @@ module.exports = function (bap) {
         } else if (node.has('type') && node.get('type').type() === 'string') {
             model.type = extractType(node.get('type').value);
         } else {
-            bap.log.warn(4399, 'Neityer suitable type or properties found to build a model', node.meta.origins.toString());
+            bap.log.warn(4399, 'No suitable type or properties found to build a model', node.meta.origins.toString(), node.path);
         }
         bap.model[model.qualifiedName] = model;
         return model.qualifiedName;
@@ -64,10 +65,19 @@ module.exports = function (bap) {
         var type = {};
         properties.filterFirst(function (node) {
             if (node.type() === 'string') {
+                // property
                 type[node.key] = extractType(node.value);
             } else if (node.type() === 'object') {
-                var qualifiedName = extractModel(node, entityName);
-                type[node.key] = qualifiedName;
+                if(node.has('properties') && node.get('properties').type()==='object'){
+                    // inline entity
+                    var qualifiedName = extractModel(node, entityName);
+                    type[node.key] = qualifiedName;
+                } else if(node.has('type') && node.get('type').type()==='string'){
+                    // expanded property
+                    type[node.key]=extractType(node.get('type').value);
+                } else{
+                    bap.warn(6043, 'Unspecified property type.', node.meta.origins.toString());
+                }
             }
         });
         return type;

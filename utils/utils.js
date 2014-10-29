@@ -13,9 +13,9 @@ var Utils = function () {
     /**
      * Generates four random digits.
      */
-    this.random = function () {
+    this.random4 = function () {
         return sprintf('%04d', Math.floor(Math.random() * 9999));
-    }
+    };
 };
 
 module.exports = new Utils();

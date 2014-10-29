@@ -147,6 +147,7 @@ module.exports = function Compiler (sourceFileNameParam, sourceParam, resultPara
             if (node.level === 1) {
                 if (node.type() !== JsType.OBJECT) {
                     valid = false;
+                    debugger;
                     that.error('E5763', node.path, "Only complex objects allowed as root elements.");
                 }
             }

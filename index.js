@@ -168,7 +168,6 @@ module.exports = {
                 } else if(typeof entity.type ==='object'){
                     res+=su.format("%s\n", key);
                     for(var keyType in entity.type){
-                        debugger;
                         var type = entity.type[keyType];
                         if(type instanceof Array){
                             res+=su.format("\t%s: list(%s)\n", keyType, type);
