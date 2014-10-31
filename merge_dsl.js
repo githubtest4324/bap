@@ -34,4 +34,5 @@ module.exports = function (dsl, inputDsl) {
     });
 
     merge.apply(this, mergeInput);
+    dsl.meta = new Meta();
 };

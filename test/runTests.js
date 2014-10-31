@@ -29,6 +29,8 @@ function runTests() {
     console.log('test2: ' + passed(res));
     res = ts2.test3();
     console.log('test3: ' + passed(res));
+    res = ts2.test4();
+    console.log('test4: ' + passed(res));
 
     console.log('============= TS3 =============');
     res = ts3.test1();

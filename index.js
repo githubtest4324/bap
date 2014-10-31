@@ -1,11 +1,10 @@
-var BaseGen = function(){
+var BaseGen = function () {
     'use strict';
-    this.context=undefined;
-    this.name=undefined;
-    this.version=undefined;
-    this.dependencies = [];
-    this.init= function (context) {
-        this.context = context;
+    this.bap = undefined;
+    this.name = undefined;
+    this.version = undefined;
+    this.init = function (bap) {
+        this.bap = bap;
     };
     this.model = function () {
     };
@@ -13,7 +12,7 @@ var BaseGen = function(){
     };
 };
 module.exports = {
-        BaseGen : BaseGen,
+    BaseGen : BaseGen,
     Bap : function (dslInputParam) {
         'use strict';
 
@@ -26,7 +25,8 @@ module.exports = {
         var mergeDsl = require('./merge_dsl');
         var Meta = require('./metadata');
         var buildModel = require('./modelBuilder');
-        
+        var ModelBase = require('./model_base');
+
         var DslInput = function () {
             this.filePath = undefined;
             this.fileName = undefined;
@@ -37,7 +37,7 @@ module.exports = {
         this.log = new Log();
         this.dsl = new JefNode({});
         this.generators = [];
-        this.model = {};
+        this.model = new ModelBase(this);
         /**
          * Holds input files as DslInput objects.
          */
@@ -49,39 +49,49 @@ module.exports = {
             // populates dsl with sections received in dslInput.
             mergeDsl(this.dsl, dslInput);
             extractConfig();
-            validateInput(this.dsl);
-            extractGenerators();
+            if(!validateInput(this.dsl)){
+                return;
+            }
+            if(!extractGenerators()){
+                return;
+            }
             buildModel(that);
+            
             // Model
-            this.generators.forEach(function (generator){
+            this.generators.forEach(function (generator) {
                 generator.model();
             });
             // Generate
-            this.generators.forEach(function (generator){
+            this.generators.forEach(function (generator) {
                 generator.generate();
             });
         };
 
         var extractGenerators = function () {
+            var valid = true;
             var gen = that.config.get('generators');
             if (!gen) {
                 that.log.warn(3846, 'No generators defined.', that.config.meta.origins);
             } else if (!gen.hasType('array')) {
-                that.log.warn(6962, 'Generators config wrong format.', gen.meta.origins);
+                that.log.error(6962, 'Generators config wrong format.', gen.meta.origins);
+                valid = false;
             } else {
                 gen.filterFirst(function (node) {
                     if (!node.hasType('string')) {
-                        that.log.warn(8263, 'Generator config wrong format.', node.meta.origins);
+                        that.log.error(8263, 'Generator config wrong format.', node.meta.origins);
+                        valid = false;
                     } else {
                         var generator = resolveGenerator(node);
-                        generator.init(that);
                         if (generator) {
+                            generator.init(that);
                             that.generators.push(generator);
                         } else {
+                            valid = false;
                         }
                     }
                 });
             }
+            return valid;
         };
 
         var resolveGenerator = function (generatorNode) {
@@ -104,14 +114,17 @@ module.exports = {
                     var generator = new GeneratorClass(that);
                     if (!generator instanceof BaseGen) {
                         that.log.error(2001, su.format('"%s" is not instance of Generator.', generatorName), generatorNode.meta.origins);
+                        return null;
+                    } else{
+                        return generator;
                     }
-                    return generator;
                 } catch (err) {
                     that.log.error(5478, su.format('Could not initialize "%s": %s', generatorName, err.toString()), generatorNode.meta.origins);
+                    return null;
                 }
             } else {
                 that.log.error(7594, su.format('Unknown generator "%s".', generatorName), generatorNode.meta.origins);
-                return undefined;
+                return null;
             }
         };
 
@@ -151,68 +164,56 @@ module.exports = {
         this.printGenerators = function () {
             var res = '';
             this.generators.forEach(function (generator) {
-                res += generator.name+'\n';
-                res += su.tab(1) + generator.version+'\n';
+                res += generator.name + '\n';
+                res += su.tab(1) + generator.version + '\n';
 
             });
 
             return res;
         };
-        
-        this.printModel = function(){
-            var res = "";
-            for(var key in this.model){
-                var entity = this.model[key];
-                if(entity.type instanceof Array){
-                    res+=su.format("%s: list(%s)\n", key, entity.type[0]);
-                } else if(typeof entity.type ==='object'){
-                    res+=su.format("%s\n", key);
-                    for(var keyType in entity.type){
-                        var type = entity.type[keyType];
-                        if(type instanceof Array){
-                            res+=su.format("\t%s: list(%s)\n", keyType, type);
-                        } else{
-                            res+=su.format("\t%s: %s\n", keyType, type);
-                        }
-                    }
-                } else if(typeof entity.type === 'string'){
-                    res+=su.format("%s: %s\n", key, entity.type);
+
+        this.printModel = function () {
+            return su.pretty(this.model.types, 4, function (key, value) {
+                if (value instanceof JefNode) {
+                    return value.meta.origins.toString() + "." + value.path;
+                } else {
+                    return value;
                 }
-            }
-            return res;
+            });
         };
+
         /**
          * Returns the namespace of specified dsl node.
          */
-        this.getNamespace  = function(node){
+        this.getNamespace = function (node) {
             var path = [];
-            while(!node.isRoot){
+            while (!node.isRoot) {
                 path.push(node);
-                node=node.parent;
+                node = node.parent;
             }
             var namespace = "";
             // iterate from root to node
-            for(var i = path.length-1; i>=0; i--){
+            for (var i = path.length - 1; i >= 0; i--) {
                 node = path[i];
                 var isns = isNamespace(node);
-                if(isns){
-                    if(namespace){
-                        namespace+='.'+node.key;
-                    }else{
-                        namespace+=node.key;
+                if (isns) {
+                    if (namespace) {
+                        namespace += '.' + node.key;
+                    } else {
+                        namespace += node.key;
                     }
-                } else{
+                } else {
                     break;
                 }
             }
             return namespace;
         };
-        
-        var isNamespace = function(node){
+
+        var isNamespace = function (node) {
             var res = true;
-            node.filterFirst(function(child){
+            node.filterFirst(function (child) {
                 // a namespace is formed only by objects
-                if(child.hasType('string', 'number', 'boolean')){
+                if (child.hasType('string', 'number', 'boolean')) {
                     res = false;
                 }
             });

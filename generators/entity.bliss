@@ -1,0 +1,19 @@
+@!(entity, generator, model)
+package @entity.namespace
+
+@for(propName in entity.properties){@{prop = entity.properties[propName]}
+@if(!model.isPrimitive(model.baseType(prop))){import @model.baseType(prop)}
+}	
+
+
+/**
+ * 
+ * Created by @generator
+ /*
+public class @entity.name {
+	@for(propName in entity.properties){
+@if(false){@'aa'}
+		private @entity
+	}	
+
+}

@@ -76,8 +76,7 @@ var Ts2 = function () {
         }
         var testResult = res1.toString() === [
                 'Error[E2943] at f1,f2: "type" is not allowed as top level element',
-                'Error[E5763] at f1,f2.type: Only complex objects allowed as root elements.',
-                'Warn[W3846] at : No generators defined.'
+                'Error[E5763] at f1,f2.type: Only complex objects allowed as root elements.'
         ].toString();
         return testResult;
     };
@@ -98,6 +97,50 @@ var Ts2 = function () {
 
         var testResult2 = res2 === res2Expected;
         return testResult1 && testResult2;
+    };
+
+    // model generation
+    this.test4 = function () {
+        var bap = new Bap([
+            {
+                name : 'f1',
+                dsl : {
+                    ns1 : {
+                        E1 : {
+                            model : true,
+                            type : 'entity',
+                            properties : {
+                                p2 : 'E1',
+                                p3 : 'ns1.E1'
+
+                            }
+                        }
+                    },
+                    ns2 : {
+                        E1 : {
+                            model : true,
+                            type : 'entity',
+                            properties : {
+                                p2 : 'E1',
+                                p3 : 'ns2.E1'
+
+                            }
+                        }
+                    }
+
+                }
+            }
+        ]);
+        bap.generate();
+        var res1 = bap.log.toStringArray();
+        if (false) {
+            console.log(res1);
+        }
+        return res1.toString() === [
+                'Warn[W3846] at : No generators defined.',
+                'Error[E9507] at f1.ns1.E1.properties.p2: Ambiguous type E1. Pick from ns1.E1,ns2.E1',
+                'Error[E9507] at f1.ns2.E1.properties.p2: Ambiguous type E1. Pick from ns1.E1,ns2.E1'
+        ].toString();
     };
 
     return this;

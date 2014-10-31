@@ -2,6 +2,12 @@ var Utils = function () {
     'use strict';
     var sprintf = require('sprintf-js').sprintf;
 
+    this.constants = {
+        primitives : [
+                'int', 'num', 'double', 'float', 'bool', 'str', 'decimal', 'date', 'time', 'datetime'
+        ]
+    };
+
     /**
      * Returns one of 'string', 'array', 'object', 'function', 'number',
      * 'boolean', 'null', 'undefined'.

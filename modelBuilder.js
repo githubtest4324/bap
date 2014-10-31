@@ -1,25 +1,36 @@
+/**
+ * Builds and validates model. Returns true if model is correctly created.
+ */
 module.exports = function (bap) {
     'use strict';
     var su = require('./utils/string');
-
+    var u = require('./utils/utils');
+    
     var duplicatedModelNo = 0;
-    var isPrimitive = function (type) {
-        return [
-                'int', 'number', 'double', 'float', 'bool', 'string', 'decimal', 'date', 'time', 'datetime'
-        ].indexOf(type) !== -1;
-    };
+    var valid = true;
 
+    var isPrimitive = function (type) {
+        return u.constants.primitives.indexOf(type) !== -1;
+    };
+   
     var build = function () {
+        // build model
         bap.dsl.filter(function (node) {
             if (node.has('model') && node.get('model').type() === 'boolean') {
                 extractModel(node);
             }
         });
+
+        // qualify names
+        qualifyAllNames();
+
+        return valid;
     };
 
     // extracts model and returns its qualified name
     var extractModel = function (node, namePrefix) {
         var model = {};
+        node.meta.modelEntity = model;
         // namespace
         model.namespace = bap.getNamespace(node);
 
@@ -29,22 +40,30 @@ module.exports = function (bap) {
         } else {
             model.name = namePrefix ? namePrefix + node.key : node.key;
         }
-        if(bap.model[model.namespace + '.' + model.name]){
-            model.name+=su.format("%03d", duplicatedModelNo++);
+        if (bap.model.types[model.namespace + '.' + model.name]) {
+            model.name += su.format("%03d", duplicatedModelNo++);
         }
 
+        // dsl
+        model.dsl = node;
+        
         // qualified name
         model.qualifiedName = model.namespace + '.' + model.name;
 
         // type
         if (node.has('properties') && node.get('properties').type() === 'object') {
-            model.type = extractProperties(node.get('properties'), model.name);
+            // entity
+            model.properties = extractProperties(node.get('properties'), model.name);
         } else if (node.has('type') && node.get('type').type() === 'string') {
-            model.type = extractType(node.get('type').value);
+            // type
+            model.property = {
+                dsl : node,
+                type : extractType(node.get('type').value)
+            };
         } else {
             bap.log.warn(4399, 'No suitable type or properties found to build a model', node.meta.origins.toString(), node.path);
         }
-        bap.model[model.qualifiedName] = model;
+        bap.model.types[model.qualifiedName] = model;
         return model.qualifiedName;
     };
 
@@ -62,26 +81,115 @@ module.exports = function (bap) {
     };
 
     var extractProperties = function (properties, entityName) {
-        var type = {};
+        var res = {};
         properties.filterFirst(function (node) {
+            var qualifiedName;
             if (node.type() === 'string') {
                 // property
-                type[node.key] = extractType(node.value);
+                res[node.key] = {
+                    dsl : node,
+                    type : extractType(node.value)
+                };
+                node.meta.modelProperty = res[node.key];
             } else if (node.type() === 'object') {
-                if(node.has('properties') && node.get('properties').type()==='object'){
+                if (node.has('properties') && node.get('properties').type() === 'object') {
                     // inline entity
-                    var qualifiedName = extractModel(node, entityName);
-                    type[node.key] = qualifiedName;
-                } else if(node.has('type') && node.get('type').type()==='string'){
+                    qualifiedName = extractModel(node, entityName);
+                    res[node.key] = {
+                        dsl : node,
+                        type : qualifiedName
+                    };
+                    node.meta.modelProperty = res[node.key];
+                } else if (node.has('type') && node.get('type').type() === 'string') {
                     // expanded property
-                    type[node.key]=extractType(node.get('type').value);
-                } else{
-                    bap.warn(6043, 'Unspecified property type.', node.meta.origins.toString());
+                    res[node.key] = {
+                        dsl : node,
+                        type : extractType(node.get('type').value)
+                    };
+                    node.meta.modelProperty = res[node.key];
+                } else if (node.has('type') && node.get('type').type() === 'object') {
+                    // inline entity
+                    qualifiedName = extractModel(node.get('type'), entityName);
+                    res[node.key] = {
+                        dsl : node,
+                        type : qualifiedName
+                    };
+                    node.meta.modelProperty = res[node.key];
+                } else {
+                    bap.log.warn(6043, 'Unspecified property type.', node.meta.origins.toString(), node.path);
                 }
             }
         });
-        return type;
+        return res;
     };
 
+    var qualifyAllNames = function () {
+        for ( var qn in bap.model.types) {
+            var entity = bap.model.types[qn];
+            if (entity.properties) {
+                for ( var propName in entity.properties) {
+                    var prop = entity.properties[propName];
+                    qualifyProperty(prop);
+                }
+            }
+            if (entity.property) {
+                qualifyProperty(entity.property);
+            }
+        }
+    };
+
+    var qualifyProperty = function(prop){
+        var matches, type;
+        if(prop.type instanceof Array){
+            type = prop.type[0];
+            matches = qualifyName(type);
+            if(typeof matches==='string'){
+                prop.type[0] = matches;
+            }
+        } else {
+            type = prop.type;
+            matches = qualifyName(type);
+            if(typeof matches==='string'){
+                prop.type = matches;
+            }
+        }
+        if(matches instanceof Array){
+            if(matches.length ===0){
+                bap.log.error(9507, su.format('Cannot find type %s', type), prop.dsl.meta.origins.toString(), prop.dsl.path);
+                valid = false;
+            } else{
+                bap.log.error(9507, su.format('Ambiguous type %s. Pick from %s', type, matches), prop.dsl.meta.origins.toString(), prop.dsl.path);
+                valid = false;
+            }
+        }
+    };
+    
+    /**
+     * Gets the qualified name given the name of an entity. 
+     * Returns the qualified name if one match is found.
+     * Returns an array if no matches or multiple matches are found.
+     */
+    var qualifyName = function (name) {
+        if (isPrimitive(name)) {
+            return name;
+        }
+        var matches = [];
+        for ( var qn in bap.model.types) {
+            if(name===qn){
+                matches.push(qn);
+            } else{
+                var qnArr = qn.split('.');
+                if (qnArr[qnArr.length - 1] === name) {
+                    matches.push(qn);
+                }
+            }
+        }
+        if (matches.length === 1) {
+            return matches[0];
+        } else {
+            return matches;
+        }
+    };
+    
     build();
 };
