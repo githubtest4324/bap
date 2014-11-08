@@ -1,5 +1,6 @@
 var Bap = require('../../index').Bap;
 var fs = require('fs');
+var su = require('../../utils/string');
 
 // mergeDslInput() tests
 var Ts2 = function () {
@@ -86,17 +87,46 @@ var Ts2 = function () {
         bap.generate();
         var res1 = bap.log.toStringArray();
         var res2 = bap.printModel();
+        var res3 = bap.dsl.filter(function (node) {
+            var prop, type;
+            if (node.meta.modelEntity && node.meta.modelProperty) {
+                // Inline entity
+                prop = node.meta.modelProperty;
+                if (bap.model.isList(prop)) {
+                    type = su.format("list(%s)", bap.model.baseType(prop));
+                } else {
+                    type = prop.type;
+                }
+                return su.format("Inline Entity: property: %s, entity: %s, dslPath: %s", type, node.meta.modelEntity.qualifiedName, node.path);
+            } else if (node.meta.modelEntity) {
+                // Entity
+                return su.format("Entity: qn: %s, dslPath: %s", node.meta.modelEntity.qualifiedName, node.path);
+            } else if (node.meta.modelProperty) {
+                // Property
+                prop = node.meta.modelProperty;
+                if (bap.model.isList(prop)) {
+                    type = su.format("list(%s)", bap.model.baseType(prop));
+                } else {
+                    type = prop.type;
+                }
+                var entity = bap.model.propEntity(prop);
+                return su.format("Property: property name: %s, type: %s, parent entity: %s, dslPath: %s", bap.model.propName(prop), type, entity.qualifiedName, node.path);
+            }
+        });
         if (false) {
             console.log(res1);
             console.log(res2);
+            console.log(su.pretty(res3));
         }
+        debugger;
         var res2Expected = fs.readFileSync(__dirname + '/test3-expected.txt', 'utf8');
+        var res3Expected = fs.readFileSync(__dirname + '/test3-expected2.txt', 'utf8');
         var testResult1 = res1.toString() === [
                 'Warn[W3846] at : No generators defined.', 'Warn[W4399] at f1.ns1.E2: No suitable type or properties found to build a model'
         ].toString();
-
         var testResult2 = res2 === res2Expected;
-        return testResult1 && testResult2;
+        var testResult3 = su.pretty(res3) === res3Expected;
+        return testResult1 && testResult2 && testResult3;
     };
 
     // model generation

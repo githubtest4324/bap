@@ -25,7 +25,51 @@ module.exports = [
                             properties : {
                                 p3 : 'str'
                             }
-                        }
+                        },
+                        p7 : {
+                            type : {
+                                name : 'E4',
+                                properties : {
+                                    p7_E4 : 'str'
+                                }
+                            }
+                        },
+                        p8 : {
+                            type : {
+                                properties : {
+                                    p8_p1 : 'str'
+                                }
+                            }
+                        },
+                        p9 : {
+                            type : {
+                                list : {
+                                    name : 'E5',
+                                    properties : {
+                                        p1 : 'str'
+                                    }
+                                }
+                            }
+
+                        },
+                        p10 : {
+                            type : {
+                                list : {
+                                    properties : {
+                                        p1 : 'str'
+                                    }
+                                }
+                            }
+
+                        },
+                        p11 : {
+                            list : {
+                                name : 'E6',
+                                properties : {
+                                    p1 : 'str'
+                                }
+                            }
+                        },
                     }
                 },
                 E2 : {
@@ -56,13 +100,13 @@ module.exports = [
                     },
                     output : {
                         model : true,
-                        type : '[str]',
+                        type : '[str]'
                     }
                 },
                 Page1 : {
                     type : 'page',
                     model : {
-                        mdodel : true,
+                        model : true,
                         properties : {
                             p5 : 'str',
                             p6 : {
@@ -76,7 +120,6 @@ module.exports = [
                     }
                 }
             }
-
         }
     }
 ];

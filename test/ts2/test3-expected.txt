@@ -2,6 +2,7 @@
     "ns1.E1p2": {
         "namespace": "ns1",
         "name": "E1p2",
+        "dsl": "f1.ns1.E1.properties.p2",
         "qualifiedName": "ns1.E1p2",
         "properties": {
             "p2_1": {
@@ -13,6 +14,7 @@
     "ns1.E3": {
         "namespace": "ns1",
         "name": "E3",
+        "dsl": "f1.ns1.E1.properties.p6",
         "qualifiedName": "ns1.E3",
         "properties": {
             "p3": {
@@ -21,9 +23,70 @@
             }
         }
     },
+    "ns1.E4": {
+        "namespace": "ns1",
+        "name": "E4",
+        "dsl": "f1.ns1.E1.properties.p7.type",
+        "qualifiedName": "ns1.E4",
+        "properties": {
+            "p7_E4": {
+                "dsl": "f1.ns1.E1.properties.p7.type.properties.p7_E4",
+                "type": "str"
+            }
+        }
+    },
+    "ns1.E1type": {
+        "namespace": "ns1",
+        "name": "E1type",
+        "dsl": "f1.ns1.E1.properties.p8.type",
+        "qualifiedName": "ns1.E1type",
+        "properties": {
+            "p8_p1": {
+                "dsl": "f1.ns1.E1.properties.p8.type.properties.p8_p1",
+                "type": "str"
+            }
+        }
+    },
+    "ns1.E5": {
+        "namespace": "ns1",
+        "name": "E5",
+        "dsl": "f1.ns1.E1.properties.p9.type.list",
+        "qualifiedName": "ns1.E5",
+        "properties": {
+            "p1": {
+                "dsl": "f1.ns1.E1.properties.p9.type.list.properties.p1",
+                "type": "str"
+            }
+        }
+    },
+    "ns1.E1list": {
+        "namespace": "ns1",
+        "name": "E1list",
+        "dsl": "f1.ns1.E1.properties.p10.type.list",
+        "qualifiedName": "ns1.E1list",
+        "properties": {
+            "p1": {
+                "dsl": "f1.ns1.E1.properties.p10.type.list.properties.p1",
+                "type": "str"
+            }
+        }
+    },
+    "ns1.E6": {
+        "namespace": "ns1",
+        "name": "E6",
+        "dsl": "f1.ns1.E1.properties.p11.list",
+        "qualifiedName": "ns1.E6",
+        "properties": {
+            "p1": {
+                "dsl": "f1.ns1.E1.properties.p11.list.properties.p1",
+                "type": "str"
+            }
+        }
+    },
     "ns1.E1": {
         "namespace": "ns1",
         "name": "E1",
+        "dsl": "f1.ns1.E1",
         "qualifiedName": "ns1.E1",
         "properties": {
             "p1": {
@@ -53,17 +116,45 @@
             "p6": {
                 "dsl": "f1.ns1.E1.properties.p6",
                 "type": "ns1.E3"
+            },
+            "p7": {
+                "dsl": "f1.ns1.E1.properties.p7",
+                "type": "ns1.E4"
+            },
+            "p8": {
+                "dsl": "f1.ns1.E1.properties.p8",
+                "type": "ns1.E1type"
+            },
+            "p9": {
+                "dsl": "f1.ns1.E1.properties.p9",
+                "type": [
+                    "ns1.E5"
+                ]
+            },
+            "p10": {
+                "dsl": "f1.ns1.E1.properties.p10",
+                "type": [
+                    "ns1.E1list"
+                ]
+            },
+            "p11": {
+                "dsl": "f1.ns1.E1.properties.p11.list",
+                "type": [
+                    "ns1.E6"
+                ]
             }
         }
     },
     "ns1.E2": {
         "namespace": "ns1",
         "name": "E2",
+        "dsl": "f1.ns1.E2",
         "qualifiedName": "ns1.E2"
     },
     "ns1.Rest1Request": {
         "namespace": "ns1",
         "name": "Rest1Request",
+        "dsl": "f1.ns1.Rest1.input",
         "qualifiedName": "ns1.Rest1Request",
         "property": {
             "dsl": "f1.ns1.Rest1.input",
@@ -75,6 +166,7 @@
     "ns1.output": {
         "namespace": "ns1",
         "name": "output",
+        "dsl": "f1.ns1.Rest1.output",
         "qualifiedName": "ns1.output",
         "property": {
             "dsl": "f1.ns1.Rest1.output",
@@ -84,6 +176,7 @@
     "ns1.input": {
         "namespace": "ns1",
         "name": "input",
+        "dsl": "f1.ns1.Rest2.input",
         "qualifiedName": "ns1.input",
         "properties": {
             "p4": {
@@ -101,12 +194,45 @@
     "ns1.output000": {
         "namespace": "ns1",
         "name": "output000",
+        "dsl": "f1.ns1.Rest2.output",
         "qualifiedName": "ns1.output000",
         "property": {
             "dsl": "f1.ns1.Rest2.output",
             "type": [
                 "str"
             ]
+        }
+    },
+    "ns1.modelp6": {
+        "namespace": "ns1",
+        "name": "modelp6",
+        "dsl": "f1.ns1.Page1.model.properties.p6",
+        "qualifiedName": "ns1.modelp6",
+        "properties": {
+            "p7": {
+                "dsl": "f1.ns1.Page1.model.properties.p6.properties.p7",
+                "type": "ns1.E1"
+            },
+            "p8": {
+                "dsl": "f1.ns1.Page1.model.properties.p6.properties.p8",
+                "type": "str"
+            }
+        }
+    },
+    "ns1.model": {
+        "namespace": "ns1",
+        "name": "model",
+        "dsl": "f1.ns1.Page1.model",
+        "qualifiedName": "ns1.model",
+        "properties": {
+            "p5": {
+                "dsl": "f1.ns1.Page1.model.properties.p5",
+                "type": "str"
+            },
+            "p6": {
+                "dsl": "f1.ns1.Page1.model.properties.p6",
+                "type": "ns1.modelp6"
+            }
         }
     }
 }

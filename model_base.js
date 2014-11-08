@@ -19,6 +19,9 @@ module.exports = function(bap){
         }
     };
     
+    /**
+     * If 'prop' is list, returns list's type otherwise returns prop's type. 
+     */
     this.baseType = function(prop){
         if(!validateProperty(prop)){
             return undefined;
@@ -27,7 +30,10 @@ module.exports = function(bap){
         return listType?listType:prop.type;
     };
     
-    this.getPropEntity = function(prop){
+    /**
+     * The parent entity of 'prop'.
+     */
+    this.propEntity = function(prop){
         if(!validateProperty(prop)){
             return undefined;
         }
@@ -38,8 +44,15 @@ module.exports = function(bap){
             }
             dsl = dsl.parent;
         }
-        bap.log(8797, "Invalid dsl. Missing parent entity.", prop.dsl.meta.origins.toString(), prop.dsl.path);
+        bap.log.error(8797, "Invalid dsl. Missing parent entity.", prop.dsl.meta.origins.toString(), prop.dsl.path);
         return undefined;
+    };
+
+    this.propName = function(prop){
+        if(!validateProperty(prop)){
+            return undefined;
+        }
+        return prop.dsl.key;
     };
     
     var validateProperty = function(prop){
@@ -51,7 +64,7 @@ module.exports = function(bap){
                 origin1 = prop.dsl.meta.origins.toString();
                 origin2 = prop.dsl.path;
             }
-            bap.log(5593, "Received object is not a model property.", origin1, origin2);
+            bap.log.error(5593, "Received object is not a model property.", origin1, origin2);
             return false;
         }
     };
