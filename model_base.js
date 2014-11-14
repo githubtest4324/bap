@@ -1,45 +1,58 @@
-
-module.exports = function(bap){
+module.exports = function (bap) {
     'use strict';
     var u = require('./utils/utils');
     this.types = {};
 
+    /**
+     * Returns true for primitive types.
+     */
     this.isPrimitive = function (type) {
         return u.constants.primitives.indexOf(type) !== -1;
     };
+
+    /**
+     * Returns type given a qualified name.
+     */
+    this.typeName = function (qualifiedName) {
+        var qnArr = qualifiedName.split('.');
+        return qnArr[qnArr.length - 1];
+    };
     
-    this.isList = function(prop){
-        if(!validateProperty(prop)){
+    /**
+     * Returns true for list properties.
+     */
+    this.isList = function (prop) {
+        if (!validateProperty(prop)) {
             return undefined;
         }
-        if(prop.type instanceof Array){
+        if (prop.type instanceof Array) {
             return prop.type[0];
-        } else{
+        } else {
             return null;
         }
     };
-    
+
     /**
      * If 'prop' is list, returns list's type otherwise returns prop's type. 
      */
-    this.baseType = function(prop){
-        if(!validateProperty(prop)){
+    this.baseType = function (prop) {
+        if (!validateProperty(prop)) {
             return undefined;
         }
         var listType = this.isList(prop);
-        return listType?listType:prop.type;
+        return listType ? listType : prop.type;
     };
-    
+
     /**
      * The parent entity of 'prop'.
      */
-    this.propEntity = function(prop){
-        if(!validateProperty(prop)){
+    this.propEntity = function (prop) {
+        if (!validateProperty(prop)) {
             return undefined;
         }
         var dsl = prop.dsl;
-        while(!dsl.isRoot){
-            if(dsl.meta.modelEntity){
+        while (!dsl.isRoot) {
+            if (dsl.meta.modelEntity) {
                 return dsl.meta.modelEntity;
             }
             dsl = dsl.parent;
@@ -48,19 +61,22 @@ module.exports = function(bap){
         return undefined;
     };
 
-    this.propName = function(prop){
-        if(!validateProperty(prop)){
+    /**
+     * Returns propertie's name.
+     */
+    this.propName = function (prop) {
+        if (!validateProperty(prop)) {
             return undefined;
         }
         return prop.dsl.key;
     };
-    
-    var validateProperty = function(prop){
-        if(prop.dsl && prop.dsl.meta && prop.dsl.meta.modelProperty){
+
+    var validateProperty = function (prop) {
+        if (prop.dsl && prop.dsl.meta && prop.dsl.meta.modelProperty) {
             return true;
-        } else{
+        } else {
             var origin1, origin2;
-            if(prop.dsl){
+            if (prop.dsl) {
                 origin1 = prop.dsl.meta.origins.toString();
                 origin2 = prop.dsl.path;
             }

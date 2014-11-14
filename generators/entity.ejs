@@ -1,0 +1,29 @@
+package ||=package||;
+
+
+||for(var i=0; i<imports.length; i++){ var imp = imports[i];-||
+import ||=imp||;
+||}||
+
+
+/**
+ * 
+ * Created by TODO
+ */
+public class ||=name|| {
+||for(i=0; i<fields.length; i++){ var field = fields[i];-||
+	private ||-field.type|| ||=field.name||;
+||}||
+
+||for(i=0; i<fields.length; i++){ var field = fields[i];-||
+	public ||-field.type|| get||=:field.name | capitalize ||(){
+		return this.||=field.name||;
+	}
+	public void set||=:field.name | capitalize ||(||-field.type|| ||=field.name||){
+		this.||=field.name|| = ||=field.name||;
+	}
+||}||
+
+}
+
+
