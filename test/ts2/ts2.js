@@ -118,7 +118,6 @@ var Ts2 = function () {
             console.log(res2);
             console.log(su.pretty(res3));
         }
-        debugger;
         var res2Expected = fs.readFileSync(__dirname + '/test3-expected.txt', 'utf8');
         var res3Expected = fs.readFileSync(__dirname + '/test3-expected2.txt', 'utf8');
         var testResult1 = res1.toString() === [

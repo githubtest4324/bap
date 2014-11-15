@@ -3,6 +3,7 @@
 var ts1 = require('./ts1/ts1');
 var ts2 = require('./ts2/ts2');
 var ts3 = require('./ts3-merge/ts3');
+var ts4 = require('./ts4-gen-entityJava/ts4');
 
 function passed(value){
 	return value?'Passed':'!!!!FAILED!!!!';
@@ -59,6 +60,10 @@ function runTests() {
     console.log('test11: ' + passed(res));
     res = ts3.test12();
     console.log('test12: ' + passed(res));
+
+    console.log('============= TS4 =============');
+    res = ts4.test1();
+    console.log('test1: ' + passed(res));
 }
 
 

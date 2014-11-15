@@ -23,7 +23,7 @@ module.exports = function () {
     };
     this.generate = function () {
         var javaEntityModel = templateModel();
-        console.log(JSON.stringify(javaEntityModel, null, 4));
+        //console.log(JSON.stringify(javaEntityModel, null, 4));
         javaEntityModel.forEach(function(javaEntity){
             genent(javaEntity);
         });
@@ -31,7 +31,7 @@ module.exports = function () {
 
     var genent = function (entity) {
         var ent = template(entity);
-        var pth = path.normalize(path.join(that.bap.config.value.rootFolder, that.config.value.sourceDir, entity.qualifiedName.replace('.', '/') + ".java"));
+        var pth = path.normalize(path.join(that.config.value.sourceDir, entity.qualifiedName.replace('.', '/') + ".java"));
         if (pth.indexOf('/') !== 0) {
             pth = path.join(process.cwd(), pth);
         }
