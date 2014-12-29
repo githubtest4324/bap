@@ -16,7 +16,7 @@
 	"filendir": "0.0.1"
   },
   "devDependencies": {
-      "node-dir-diff": "0.0.1-a"
+      "dir-compare": "0.0.1"
   },
   "author": "",
   "license": "MIT"

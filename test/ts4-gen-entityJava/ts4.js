@@ -2,7 +2,7 @@ var Bap = require('../../index').Bap;
 var fs = require('fs');
 var path = require('path');
 var su = require('../../utils/string');
-var ndd = require('node-dir-diff');
+var dircompare = require('dir-compare');
 
 // mergeDslInput() tests
 var Ts4 = function () {
@@ -140,21 +140,24 @@ var Ts4 = function () {
         ]);
         bap.generate();
         var res1 = bap.log.toStringArray();
-        var res2 = 0;
-        var dd = new ndd.Dir_Diff([
-                expectedDir, genDir
-        ], 'size');
-        aici: sa folosesc https://www.npmjs.org/package/node-dir
-        dd.compare(function (err, result) {
-            res2 += result.deviation;
+        var res2 = dircompare.compareSync(expectedDir, genDir, {
+            compareContent : true
         });
         if (true) {
-            console.log(res1);
-            console.log(res2);
+//            console.log(res1);
+//            console.log(res2.same);
         }
         var testResult = res1.toString() === [
-            'Warn[W3846] at : No generators defined.'
-        ].toString() && res2 === 0;
+                'Info[I3836]: Generated /home/liviu/git/bap/test/ts4-gen-entityJava/gen/src/java/ns1/E1.java',
+                'Info[I3836]: Generated /home/liviu/git/bap/test/ts4-gen-entityJava/gen/src/java/ns1/E1p2.java',
+                'Info[I3836]: Generated /home/liviu/git/bap/test/ts4-gen-entityJava/gen/src/java/ns1/E3.java',
+                'Info[I3836]: Generated /home/liviu/git/bap/test/ts4-gen-entityJava/gen/src/java/ns1/E4.java',
+                'Info[I3836]: Generated /home/liviu/git/bap/test/ts4-gen-entityJava/gen/src/java/ns1/E1type.java',
+                'Info[I3836]: Generated /home/liviu/git/bap/test/ts4-gen-entityJava/gen/src/java/ns1/E5.java',
+                'Info[I3836]: Generated /home/liviu/git/bap/test/ts4-gen-entityJava/gen/src/java/ns1/E1list.java',
+                'Info[I3836]: Generated /home/liviu/git/bap/test/ts4-gen-entityJava/gen/src/java/ns1/E6.java'
+        ].toString() &&
+                res2.same === true;
         return testResult;
     }
 };
