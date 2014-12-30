@@ -15,23 +15,35 @@ module.exports = function () {
         close : '||'
     });
     var that = this;
-    this.init = function (bap) {
-        this.config = bap.config.get(name);
+    this.init = function (bap, id) {
+        this.config = bap.dsl.get('generators').get(id);
         this.bap = bap;
+        this.id = id;
     };
     this.model = function () {
     };
     this.generate = function () {
+        if(!validate()){
+            return;
+        }
         var javaEntityModel = templateModel();
         //console.log(JSON.stringify(javaEntityModel, null, 4));
         javaEntityModel.forEach(function(javaEntity){
             genent(javaEntity);
         });
     };
+    
+    var validate = function(){
+        if(!that.config.has('outputDir') || that.config.get('outputDir').type()!=='string'){
+            that.bap.log.error(7790, 'outputDir config parameter missing', that.config.meta.origins, that.config.path);
+            return false;
+        }
+        return true;
+    }
 
     var genent = function (entity) {
         var ent = template(entity);
-        var pth = path.normalize(path.join(that.config.value.sourceDir, entity.qualifiedName.replace('.', '/') + ".java"));
+        var pth = path.normalize(path.join(that.config.value.outputDir, entity.qualifiedName.replace('.', '/') + ".java"));
         if (pth.indexOf('/') !== 0) {
             pth = path.join(process.cwd(), pth);
         }

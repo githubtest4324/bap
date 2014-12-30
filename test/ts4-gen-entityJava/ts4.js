@@ -14,12 +14,10 @@ var Ts4 = function () {
             {
                 name : 'f1',
                 dsl : {
-                    config : {
-                        generators : [
-                            'entityJava'
-                        ],
-                        entityJava : {
-                            sourceDir : genDir
+                    generators : {
+                        'gen1' : {
+                            type : 'entityJava',
+                            outputDir : genDir
                         }
                     },
                     ns1 : {
@@ -144,8 +142,8 @@ var Ts4 = function () {
             compareContent : true
         });
         if (true) {
-//            console.log(res1);
-//            console.log(res2.same);
+            //                        console.log(res1);
+            //            console.log(res2.same);
         }
         var testResult = res1.toString() === [
                 'Info[I3836]: Generated /home/liviu/git/bap/test/ts4-gen-entityJava/gen/src/java/ns1/E1.java',

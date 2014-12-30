@@ -1,3 +1,6 @@
+/**
+ * Base class for all generators.
+ */
 var BaseGen = function () {
     'use strict';
     this.bap = undefined;
@@ -45,6 +48,9 @@ module.exports = {
         this.config = undefined;
         var that = this;
 
+        /**
+         * Parse input and run all configured generators.
+         */
         this.generate = function () {
             // populates dsl with sections received in dslInput.
             mergeDsl(this.dsl, dslInput);
@@ -67,23 +73,26 @@ module.exports = {
             });
         };
 
+        /**
+         * Parses dsl.generators and builds BaseGen objects.
+         */
         var extractGenerators = function () {
             var valid = true;
-            var gen = that.config.get('generators');
+            var gen = that.dsl.get('generators');
             if (!gen) {
-                that.log.warn(3846, 'No generators defined.', that.config.meta.origins);
-            } else if (!gen.hasType('array')) {
+                that.log.warn(3846, 'No generators defined.', that.dsl.meta.origins);
+            } else if (!gen.hasType('object')) {
                 that.log.error(6962, 'Generators config wrong format.', gen.meta.origins);
                 valid = false;
             } else {
                 gen.filterFirst(function (node) {
-                    if (!node.hasType('string')) {
+                    if (!node.has('type') || node.get('type').type()!=='string') {
                         that.log.error(8263, 'Generator config wrong format.', node.meta.origins);
                         valid = false;
                     } else {
                         var generator = resolveGenerator(node);
                         if (generator) {
-                            generator.init(that);
+                            generator.init(that, node.key);
                             that.generators.push(generator);
                         } else {
                             valid = false;
@@ -94,8 +103,11 @@ module.exports = {
             return valid;
         };
 
+        /**
+         * Builds BaseGen object.
+         */
         var resolveGenerator = function (generatorNode) {
-            var generatorName = generatorNode.value;
+            var generatorName = generatorNode.get('type').value;
             var locations = [
                     '', __dirname + '/generators/'
             ];
